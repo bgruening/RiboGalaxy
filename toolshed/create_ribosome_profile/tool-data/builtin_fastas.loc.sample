@@ -1,0 +1,8 @@
+mus_musculus_m28	m28	Mus musculus (m28) Genome	/mnt/data/indices/bowtie/genome/mus_musculus_m28/mus_musculus_m28.fa
+drosophila_melanogaster_dm6	dm6	Drosophila melanogaster (dm6) Genome	/mnt/data/indices/bowtie/genome/drosophila_melanogater_dm6/dm6.fa
+sacCer_9	sacCer9	Saccharomyces cerevisiae (v9) Genome	/mnt/data/indices/bowtie/genome/sacCer_9/S288C_reference_sequence_R9-1-1_19990210.fsa
+sarCer_3	sacCer3	Saccharomyces cerevisiae (v3) Genome	/mnt/data/indices/bowtie/genome/sacCer_3/S288C_reference_sequence_R3-1-1_19970730.fsa
+E_coli_K12_MG1655	e_coli	Escherichia coli (K12 MG1655) Genome	/mnt/data/indices/bowtie/genome/E_coli_K12_MG1655/GCF_003368535.1_ASM336853v1_genomic.fna
+Arabidopsis	araThal	Arabidopsis thaliana (TAIR10) Genome	/mnt/data/indices/bowtie/genome/Arabidopsis/GCF_000001735.4_TAIR10.1_genomic.fna
+homo_sapiens_hg19	hg19	Homo sapiens (hg19) Genome	/mnt/data/indices/bowtie/genome/homo_sapiens_hg19/hg19.fa
+homo_sapiens_hg38	hg38	Homo sapiens (hg38) Genome	/mnt/data/indices/bowtie/genome/homo_sapiens_hg38/hg38.fa

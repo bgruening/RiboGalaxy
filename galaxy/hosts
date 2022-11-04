@@ -1,0 +1,2 @@
+[galaxyservers]
+ribogalaxy.genomicsdatascience.ie ansible_connection=local ansible_user=alla ansible_sudo_pass=332left 

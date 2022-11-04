@@ -1,0 +1,51 @@
+<tool id="samtools_index" name="Samtools Index" version="2.0.4" profile="@PROFILE@">
+    <description>Create Samtools Index For Alignment File</description>
+    <macros>
+        <import>macros.xml</import>
+    </macros>
+    <expand macro="requirements"/>
+    <expand macro="stdio"/>
+    <expand macro="version_command"/>
+    <command><![CDATA[
+        @ADDTHREADS@
+	@ADDMEMORY@
+        samtools index
+            -@ \$addthreads
+            -m \$addmemory"M"
+            $prim_key_cond.prim_key_select
+            '${input1}'
+            '${output1}'
+    ]]></command>
+    <inputs>
+        <param name="input1" type="data" format="sam,unsorted.bam,cram" label="BAM File" />
+        <conditional name="prim_key_cond">
+            <param name="prim_key_select" type="select" label="Index type">
+                <option value="-b" selected="True">BAI (-b)</option>
+                <option value="-c" selected="True">CSI (-c)</option>
+            </param>
+            <when value="-b"/>
+            <when value="-c"/>
+        </conditional>
+    </inputs>
+    <outputs>
+       <data name="output1" format="bam">
+            <change_format>
+                <when input="prim_key_cond.prim_key_select" value="-b" format="bai" />
+                <when input="prim_key_cond.prim_key_select" value="-c" format="csi" />
+            </change_format>
+        </data>
+    </outputs>
+    <tests>
+        <test>
+            <param name="input1" value="1.bam" ftype="bam" />
+            <param name="prim_key_cond.prim_key_select" value="-c" />
+            <output name="output1" file="1.bam.bai" ftype="bai" lines_diff="4" />
+        </test>
+    </tests>
+    <help>
+**What it does**
+
+Indexes a BAM file 
+    </help>
+    <expand macro="citations"/>
+</tool>

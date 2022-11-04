@@ -1,0 +1,54 @@
+<job_conf>
+    <plugins workers="4">
+        <plugin id="local_plugin" type="runner" load="galaxy.jobs.runners.local:LocalJobRunner"/>
+        <plugin id="slurm" type="runner" load="galaxy.jobs.runners.slurm:SlurmJobRunner"/>
+    </plugins>
+    <destinations default="slurm_conda">
+        <destination id="local_destination" runner="local_plugin"/>
+        <destination id="slurm" runner="slurm">
+            <param id="singularity_enabled">true</param>
+            <param id="singularity_volumes">$defaults,/mnt/data:ro</param>
+            <env id="LC_ALL">C</env>
+            <env id="SINGULARITY_CACHEDIR">/tmp/singularity</env>
+            <env id="SINGULARITY_TMPDIR">/tmp</env>
+        </destination>
+        <destination id="slurm_conda" runner="slurm"/>
+        <destination id="slurm-2c" runner="slurm">
+            <param id="nativeSpecification">--nodes=1 --ntasks=1 --cpus-per-task=2</param>
+            <param id="singularity_enabled">true</param>
+            <param id="singularity_volumes">$defaults,/mnt/data:ro</param>
+            <env id="LC_ALL">C</env>
+            <env id="SINGULARITY_CACHEDIR">/tmp/singularity</env>
+            <env id="SINGULARITY_TMPDIR">/tmp</env>
+        </destination>
+        <destination id="singularity" runner="local_plugin">
+            <param id="singularity_enabled">true</param>
+            <!-- Ensuring a consistent collation environment is good for reproducibility. -->
+            <env id="LC_ALL">C</env>
+            <!-- The cache directory holds the docker containers that get converted. -->
+            <env id="SINGULARITY_CACHEDIR">/tmp/singularity</env>
+            <!-- Singularity uses a temporary directory to build the squashfs filesystem. -->
+            <env id="SINGULARITY_TMPDIR">/tmp</env>
+        </destination>
+    </destinations>
+    <tools>
+       <tool id="bowtie_genomic_wrapper" destination="slurm-2c"/>
+       <tool id="bowtie_transcriptomic_wrapper" destination="slurm-2c"/>
+       <tool id="fastqc" destination="slurm"/>
+       <tool id="cutadapt" destination="slurm"/>
+       <tool id="bowtie_rRNA_tRNA_removal_wrapper" destination="slurm"/>
+       <tool id="sam_to_bam" destination="slurm"/> 
+       <tool id="toolshed.g2.bx.psu.edu/repos/jackcurragh/ribogalaxy_samtools_sort_transcriptome/samtools_sort/2.0.4" destination="slurm"/> 
+       <tool id="toolshed.g2.bx.psu.edu/repos/jackcurragh/ribogalaxy_samtools_sort_genome/samtools_sort/2.0.4" destination="slurm"/> 
+       <tool id="samtools_chrom_sizes" destination="slurm"/> 
+       <tool id="get_chrom_sizes" destination="slurm"/> 
+       <tool id="create_ribosome_profiles" destination="slurm"/>
+       <tool id="bedGraphToBigWig" destination="slurm"/>
+       <tool id="trips_create_annotation" destination="slurm_conda"/>
+       <tool id="bam_to_sqlite" destination="slurm_conda"/>
+    </tools>
+    <limits>
+      <limit type="registered_user_concurrent_jobs">4</limit>
+      <limit type="anonymous_user_concurrent_jobs">1</limit>
+    </limits>
+</job_conf>

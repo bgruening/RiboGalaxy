@@ -1,0 +1,8 @@
+arabidopsis_thaliana_TAIR10	TAIR10	Arabidopsis thaliana (TAIR10)	/mnt/data/organism_sqlites/Arabidopsis/arabidopsis_thaliana.TAIR10.sqlite
+Escherichia_coli_str_k_12_substr_mg1655	Ecoli	Escherichia coli str k12 substr mg1655	/mnt/data/organism_sqlites/E_coli_K12_MG1655/Escherichia_coli_str_k_12_substr_mg1655.sqlite
+homo_sapiens_gencode25	g25	Homo sapiens (Gencode 25)	/mnt/data/organism_sqlites/homo_sapiens_gencode25/homo_sapiens.gencode25.sqlite
+homo_sapiens_gencode28	g28	Homo sapiens (Gencode 28)	/mnt/data/organism_sqlites/homo_sapiens_gencode28/homo_sapiens.gencode28.sqlite
+homo_sapiens_gencode39	g39	Homo sapiens (Gencode 39)	/mnt/data/organism_sqlites/homo_sapiens_gencode39/homo_sapiens.gencode39.sqlite
+mus_musculus_m10	m10	Mus musculus (Gencode m10)	/mnt/data/organism_sqlites/mus_musculus_m10/mus_musculus.gencode10.sqlite
+mus_musculus_m28	m28	Mus musculus (Gencode m28)	/mnt/data/organism_sqlites/mus_musculus_m28/mus_musculus.gencode28.sqlite
+sacCer_R64	R64	Saccharomyces cerevisiae (R64)	/mnt/data/organism_sqlites/sacCer_R64/Saccharomyces_cerevisiae.R64.sqlite

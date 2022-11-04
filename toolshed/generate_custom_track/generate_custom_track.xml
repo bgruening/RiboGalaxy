@@ -1,0 +1,28 @@
+<tool id="generate_custom_track" name="Generate Custom Track" version="0.3">
+    <description>Generates a Custom Track File for GWIPS-viz.</description>
+    <command>
+    python $__tool_directory__/construct_custom_track.py $input1 $input2 "$input3" "$input4" $input5 $output1
+    </command>
+
+    <inputs>
+        <param name="input1" type="select" label="File Type">
+            <option value="bigWig" selected="True">bigWig</option>
+            <option value="bigBed">bigBed</option>
+        </param>
+        <param name="input2" type="text" label="URL of File (copy link from history)" />
+        <param name="input3" type="text" label="Name of this sample" />
+        <param name="input4" type="text" label="Description of this sample" />
+        <param name="input5" type="text" label="chromosome position" help="Get this from Gwips.ucc.ie. Hg38 example = chr9:136,848,259-136,851,600" />
+    </inputs>
+    <outputs>
+       <data name="output1" format="txt"/>
+    </outputs>
+
+    <help>
+**What it does**
+
+Generates a custom track file for GWIPS-viz. 
+
+This is facilitates easy exploration of data processed on RiboGalaxy at a Genome wide scale.
+    </help>
+</tool>

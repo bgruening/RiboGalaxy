@@ -1,0 +1,62 @@
+<tool id="bam_to_sqlite" name="BAM to Sqlite" version="1.6">
+    <description>Convert BAM file to SQLITE for Trips-Viz</description>
+    <requirements>
+        <requirement type="package" version="0.19.0">pysam</requirement>
+        <requirement type="package" version="1.7.0">sqlitedict</requirement>
+        <requirement type="package" version="3.37.1">sqlite</requirement>
+        <requirement type="package" version="1.15.1">samtools</requirement>
+
+    </requirements>
+    <command>
+        #if $refGenomeSource.genomeSource == "builtin":
+            python $__tool_directory__/bam_to_sqlite.py $input1 ${refGenomeSource.input2_builtin.fields.path} $input3 $output1
+        #else:
+            python $__tool_directory__/bam_to_sqlite.py $input1 ${refGenomeSource.input2_file} $input3 $output1
+        #end if
+    
+    </command>
+    <inputs>
+        <param name="input1" type="data" format="bam" label="Sorted (samtools -n) BAM file" />
+        <conditional name="refGenomeSource">
+            <param name="genomeSource" type="select" label="Will you select an annotation file from your history or use a built-in option?">
+                <option value="builtin">Use a built-in SQLITE</option>
+                <option value="history">Use one from the history</option>
+            </param>
+            <when value="builtin">
+                <param name="input2_builtin" type="select" format="sqlite" label="Select a SQLITE" help="if your organism of interest is not listed - contact RiboGalaxy team">
+                    <options from_data_table="sqlites">
+                        <filter type="sort_by" column="2" />
+                        <validator type="no_options" message="No built-ins are available" />
+                    </options>
+                </param>
+            </when>
+            <when value="history">
+                <param name="input2_file" type="data" format="sqlite" label="SQLITE File" />
+            </when>
+        </conditional>
+
+        <param name="input3" type="text" label="Description of this sample" />
+    </inputs>
+    <outputs>
+       <data name="output1" format="sqlite"/>
+    </outputs>
+    <tests>
+        <test>
+            <param name="input1" value="test_n_sorted.bam" ftype="bam"/>
+            <param name="input2" value="test_org.sqlite" ftype="sqlite"/>
+            <param name="input3" value="TEST DESCRIPTION"/>
+            <output name="output1" file="test_n_sorted.bamv2.sqlite" ftype="sqlite" lines_diff="4" />
+        </test>
+    </tests>
+    <help>
+        **What it does**
+
+        Process your transcriptome read alignments for TRIPS-Viz 
+
+        Prerequisites: 
+        - name-sorted bam file (samtools sort -n)
+        - TRIPS-Viz annotation file in SQLITE format.
+    </help>
+    <citations/>
+</tool>
+

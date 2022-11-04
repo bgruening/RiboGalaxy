@@ -1,0 +1,24 @@
+<tool id="bedGraphToBigWig" name="Convert a BED File to a BigWig" version="1.2">
+    <description>Convert Ribosome Profile BED File to a BigWig</description>
+    <command><![CDATA[
+        $__tool_directory__/bedGraphToBigWig ${input1} ${input2} ${output1}
+    ]]></command>
+    <inputs>
+        <param name="input1" type="data" format="bed" label="Bed File" />
+        <param name="input2" type="data" format="tabular" label="Chromosome Sizes" help="Check out 'Get Chromosome Sizes' to fill this parameter"/>
+    </inputs>
+    <outputs>
+       <data name="output1" format="bigwig"/>
+    </outputs>
+    <tests>
+        <test>
+            <param name="input1" value="test.bed" ftype="bed" />
+            <param name="input2" value="test.chrom.sizes" ftype="tabular" />
+            <output name="output1" file="test.bw" ftype="bigwig" lines_diff="4" />
+        </test>
+    </tests>
+    <help>
+
+    </help>
+    <citations/>
+</tool>

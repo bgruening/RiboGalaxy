@@ -1,0 +1,12 @@
+sacCer9rRNA	sacCer9	Saccharomyces cerevisiae rRNA	/mnt/data/indices/bowtie/ncRNA/sacCer_9/sacCer_9_rRNA
+sacCer9tRNA	sacCer9	Saccharomyces cerevisiae tRNA	/mnt/data/indices/bowtie/ncRNA/sacCer_9/sacCer_9_tRNA
+hg38rRNA	hg38	Homo sapiens rRNA	/mnt/data/indices/bowtie/ncRNA/homo_sapiens_hg38/homo_sapiens_hg38_rRNA
+hg38tRNA	hg38	Homo sapiens tRNA	/mnt/data/indices/bowtie/ncRNA/homo_sapiens_hg38/homo_sapiens_hg38_tRNA
+e_colirRNA	e_coli	Escherichia coli rRNA	/mnt/data/indices/bowtie/ncRNA/E_coli_K12_MG1655/E_coli_K12_MG1655_rRNA
+e_colitRNA	e_coli	Escherichia coli tRNA	/mnt/data/indices/bowtie/ncRNA/E_coli_K12_MG1655/E_coli_K12_MG1655_tRNA
+dm6rRNA	dm6	Drosophila melanogater rRNA	/mnt/data/indices/bowtie/ncRNA/drosophila_melanogater_dm6/drosophila_melanogater_dm6_rRNA
+dm6tRNA	dm6	Drosophila melanogater tRNA	/mnt/data/indices/bowtie/ncRNA/drosophila_melanogater_dm6/drosophila_melanogater_dm6_tRNA
+m28rRNA	m28	Mus musculus rRNA	/mnt/data/indices/bowtie/ncRNA/mus_musculus_m28/mus_musculus_m28_rRNA
+m28tRNA	m28	Mus musculus tRNA	/mnt/data/indices/bowtie/ncRNA/mus_musculus_m28/mus_musculus_m28_tRNA
+araThalrRNA	araThal	Arabidopsis thaliana (TAIR10) rRNA	/mnt/data/indices/bowtie/ncRNA/Arabidopsis/Arabidopsis_rRNA
+araThaltRNA	araThal	Arabidopsis thaliana (TAIR10) tRNA	/mnt/data/indices/bowtie/ncRNA/Arabidopsis/Arabidopsis_tRNA

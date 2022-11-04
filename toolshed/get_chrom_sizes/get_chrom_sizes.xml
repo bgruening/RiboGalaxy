@@ -1,0 +1,52 @@
+<tool id="get_chrom_sizes" name="Get Chromosome Sizes" version="2.8">
+    <description>Generates a TAB Delimited chrom.sizes File from an Inputted FASTA</description>
+    <command>
+
+        #if $refGenomeSource.genomeSource == "builtin":
+            cat ${refGenomeSource.input1_builtin.fields.path} | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0; printf ${input2} substr($0,2,100) "\t"; } $0 !~ ">" {c+=length($0);} END {print c; }' | cat > $output1
+        #else:
+            cat ${refGenomeSource.input1_file} | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0; printf ${input2} substr($0,2,100) "\t"; } $0 !~ ">" {c+=length($0);} END {print c; }' | cat > $output1
+        #end if
+
+    </command>
+    <inputs>
+        <conditional name="refGenomeSource">
+            <param name="genomeSource" type="select" label="Will you select a reference from your history or use a built-in FASTA?">
+                <option value="builtin">Use a built-in FASTA</option>
+                <option value="history">Use one from the history</option>
+            </param>
+            <when value="builtin">
+                <param name="input1_builtin" type="select" format="fasta" label="Select a reference" help="if your reference of interest is not listed - contact RiboGalaxy team">
+                    <options from_data_table="builtin_fastas">
+                        <filter type="sort_by" column="2" />
+                        <validator type="no_options" message="No built-ins are available" />
+                    </options>
+                </param>
+            </when>
+            <when value="history">
+                <param name="input1_file" type="data" format="fasta" label="FASTA File" />
+            </when>
+        </conditional>
+
+        <param name="input2" type="text" label="Chromosome Column Prefix (add chr if absent from FASTA file for GWIPS upload)" />
+
+    </inputs>
+    <outputs>
+       <data name="output1" format="tabular"/>
+    </outputs>
+    <tests>
+        <test>
+            <param name="input1" value="test.fasta" ftype="fasta" />
+            <param name="input2" value="chr"/>
+            <output name="output1" file="test.fasta.sizes" ftype="tabular" lines_diff="4" />
+        </test>
+    </tests>
+    <help>
+**What it does**
+
+Creates a chromosome sizes file from a fasta file. This is needed for creating ribosome profiles. 
+
+Some commonly used genomes are provided to save on storage.
+    </help>
+    <citations/>
+</tool>

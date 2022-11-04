@@ -1,0 +1,30 @@
+<tool id="samtools_faidx" name="Samtools Faidx" version="2.0.4" profile="@PROFILE@">
+    <description>Index a FASTA file using Samtools</description>
+    <macros>
+        <import>macros.xml</import>
+    </macros>
+    <expand macro="requirements"/>
+    <expand macro="stdio"/>
+    <expand macro="version_command"/>
+    <command><![CDATA[
+        samtools faidx '${input1}' --fai-idx '${output1}'
+    ]]></command>
+    <inputs>
+        <param name="input1" type="data" format="fasta" label="FASTA File" />
+    </inputs>
+    <outputs>
+       <data name="output1" format="fai"/>
+    </outputs>
+    <tests>
+        <test>
+            <param name="input1" value="test.fasta" ftype="fasta" />
+            <output name="output1" file="test.fasta.fai" ftype="fai" lines_diff="4" />
+        </test>
+    </tests>
+    <help>
+**What it does**
+
+Creates a FAI index for a given FASTA file 
+    </help>
+    <expand macro="citations"/>
+</tool>
