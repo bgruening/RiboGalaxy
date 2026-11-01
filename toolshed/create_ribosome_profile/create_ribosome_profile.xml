@@ -4,7 +4,9 @@
         <requirement type="package" version="1.79">biopython</requirement>
         <requirement type="package" version="0.19.0">pysam</requirement>
     </requirements>
-    <required_files><include path="bam_to_ribosome_profile.py" /></required_files>
+    <required_files>
+        <include path="bam_to_ribosome_profile.py"/>
+    </required_files>
     <command detect_errors="exit_code"><![CDATA[
 python '$__tool_directory__/bam_to_ribosome_profile.py' '$input1' $input2 '$refGenomeSource.genomeSource'
 #if $refGenomeSource.genomeSource == "builtin":
@@ -25,38 +27,38 @@ python '$__tool_directory__/bam_to_ribosome_profile.py' '$input1' $input2 '$refG
             <when value="builtin">
                 <param name="input1_builtin" type="select" format="fasta" label="Select a reference" help="if your reference of interest is not listed - contact RiboGalaxy team">
                     <options from_data_table="builtin_fastas">
-                        <filter type="sort_by" column="2" />
-                        <validator type="no_options" message="No built-ins are available" />
+                        <filter type="sort_by" column="2"/>
+                        <validator type="no_options" message="No built-ins are available"/>
                     </options>
                 </param>
             </when>
             <when value="history">
-                <param name="input1_file" type="data" format="fasta" label="FASTA File" />
+                <param name="input1_file" type="data" format="fasta" label="FASTA File"/>
             </when>
         </conditional>
-        <param name="input4" type="select" label="Approach" help ="Use Offset for RNase and Weight for MNase">
+        <param name="input4" type="select" label="Approach" help="Use Offset for RNase and Weight for MNase">
             <option value="offset" selected="true">Use offset approach</option>
             <option value="weight">Use weight centered approach</option>
         </param>
     </inputs>
     <outputs>
-       <data name="output1" format="bedgraph"/>
+        <data name="output1" format="bedgraph"/>
     </outputs>
     <tests>
         <test>
-            <param name="input1" value="profile.bam" />
-            <param name="input2" value="15" />
-            <param name="refGenomeSource|genomeSource" value="history" />
-            <param name="refGenomeSource|input1_file" value="profile.fasta" />
-            <param name="input4" value="offset" />
-            <output name="output1" file="profile.offset.bedgraph" ftype="bedgraph" />
+            <param name="input1" value="profile.bam"/>
+            <param name="input2" value="15"/>
+            <param name="refGenomeSource|genomeSource" value="history"/>
+            <param name="refGenomeSource|input1_file" value="profile.fasta"/>
+            <param name="input4" value="offset"/>
+            <output name="output1" file="profile.offset.bedgraph" ftype="bedgraph"/>
         </test>
         <test>
-            <param name="input1" value="profile.bam" />
-            <param name="refGenomeSource|genomeSource" value="history" />
-            <param name="refGenomeSource|input1_file" value="profile.fasta" />
-            <param name="input4" value="weight" />
-            <output name="output1" file="profile.weight.bedgraph" ftype="bedgraph" />
+            <param name="input1" value="profile.bam"/>
+            <param name="refGenomeSource|genomeSource" value="history"/>
+            <param name="refGenomeSource|input1_file" value="profile.fasta"/>
+            <param name="input4" value="weight"/>
+            <output name="output1" file="profile.weight.bedgraph" ftype="bedgraph"/>
         </test>
     </tests>
     <help>
@@ -65,5 +67,7 @@ python '$__tool_directory__/bam_to_ribosome_profile.py' '$input1' $input2 '$refG
     Produce a sorted bedGraph file from a coordinate-sorted BAM file with the option of introducing an offset to the A-Site of a ribosome protected fragment.
 
     </help>
-    <citations><citation type="doi">10.1016/j.jmb.2023.168043</citation></citations>
+    <citations>
+        <citation type="doi">10.1016/j.jmb.2023.168043</citation>
+    </citations>
 </tool>

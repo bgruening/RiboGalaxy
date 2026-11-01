@@ -1,7 +1,11 @@
 <tool id="get_chrom_sizes" name="Get Chromosome Sizes" version="2.9">
     <description>Generates a TAB Delimited chrom.sizes File from an Inputted FASTA</description>
-    <requirements><requirement type="package" version="3.10">python</requirement></requirements>
-    <required_files><include path="calculating_chrom.sizes.py" /></required_files>
+    <requirements>
+        <requirement type="package" version="3.10">python</requirement>
+    </requirements>
+    <required_files>
+        <include path="calculating_chrom.sizes.py"/>
+    </required_files>
     <command detect_errors="exit_code"><![CDATA[
 python '$__tool_directory__/calculating_chrom.sizes.py'
 #if $refGenomeSource.genomeSource == "builtin":
@@ -20,28 +24,26 @@ python '$__tool_directory__/calculating_chrom.sizes.py'
             <when value="builtin">
                 <param name="input1_builtin" type="select" format="fasta" label="Select a reference" help="if your reference of interest is not listed - contact RiboGalaxy team">
                     <options from_data_table="builtin_fastas">
-                        <filter type="sort_by" column="2" />
-                        <validator type="no_options" message="No built-ins are available" />
+                        <filter type="sort_by" column="2"/>
+                        <validator type="no_options" message="No built-ins are available"/>
                     </options>
                 </param>
             </when>
             <when value="history">
-                <param name="input1_file" type="data" format="fasta" label="FASTA File" />
+                <param name="input1_file" type="data" format="fasta" label="FASTA File"/>
             </when>
         </conditional>
-
-        <param name="input2" type="text" label="Chromosome Column Prefix (add chr if absent from FASTA file for GWIPS upload)" />
-
+        <param name="input2" type="text" label="Chromosome Column Prefix (add chr if absent from FASTA file for GWIPS upload)"/>
     </inputs>
     <outputs>
-       <data name="output1" format="tabular"/>
+        <data name="output1" format="tabular"/>
     </outputs>
     <tests>
         <test>
-            <param name="refGenomeSource|genomeSource" value="history" />
-            <param name="refGenomeSource|input1_file" value="small.fasta" />
-            <param name="input2" value="chr" />
-            <output name="output1" file="small.sizes" />
+            <param name="refGenomeSource|genomeSource" value="history"/>
+            <param name="refGenomeSource|input1_file" value="small.fasta"/>
+            <param name="input2" value="chr"/>
+            <output name="output1" file="small.sizes"/>
         </test>
     </tests>
     <help>
@@ -51,5 +53,7 @@ Creates a chromosome sizes file from a fasta file. This is needed for creating r
 
 Some commonly used genomes are provided to save on storage.
     </help>
-    <citations><citation type="doi">10.1016/j.jmb.2023.168043</citation></citations>
+    <citations>
+        <citation type="doi">10.1016/j.jmb.2023.168043</citation>
+    </citations>
 </tool>

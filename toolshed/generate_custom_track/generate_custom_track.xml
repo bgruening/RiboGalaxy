@@ -1,33 +1,40 @@
 <tool id="generate_custom_track" name="Generate Custom Track" version="0.4">
     <description>Generates a Custom Track File for GWIPS-viz.</description>
-    <requirements><requirement type="package" version="3.10">python</requirement></requirements>
-    <required_files><include path="construct_custom_track.py" /></required_files>
+    <requirements>
+        <requirement type="package" version="3.10">python</requirement>
+    </requirements>
+    <required_files>
+        <include path="construct_custom_track.py"/>
+    </required_files>
     <command detect_errors="exit_code"><![CDATA[
 python '$__tool_directory__/construct_custom_track.py' '$input1' '$input2' '$input3' '$input4' '$input5' '$output1'
     ]]></command>
-
     <inputs>
         <param name="input1" type="select" label="File Type">
             <option value="bigWig" selected="True">bigWig</option>
             <option value="bigBed">bigBed</option>
         </param>
-        <param name="input2" type="text" label="URL of File (copy link from history)" />
-        <param name="input3" type="text" label="Name of this sample" />
-        <param name="input4" type="text" label="Description of this sample" />
-        <param name="input5" type="text" label="chromosome position" help="Get this from Gwips.ucc.ie. Hg38 example = chr9:136,848,259-136,851,600" />
+        <param name="input2" type="text" label="URL of File (copy link from history)"/>
+        <param name="input3" type="text" label="Name of this sample"/>
+        <param name="input4" type="text" label="Description of this sample"/>
+        <param name="input5" type="text" label="chromosome position" help="Get this from Gwips.ucc.ie. Hg38 example = chr9:136,848,259-136,851,600"/>
     </inputs>
     <outputs>
-       <data name="output1" format="txt"/>
+        <data name="output1" format="txt"/>
     </outputs>
-
     <tests>
         <test>
-            <param name="input1" value="bigWig" />
-            <param name="input2" value="https://example.org/sample.bw" />
-            <param name="input3" value="Sample one" />
-            <param name="input4" value="Ribosome profile" />
-            <param name="input5" value="chr1:1-100" />
-            <output name="output1"><assert_contents><has_text text='name="Sample one"' /><has_text text='bigDataUrl="https://example.org/sample.bw"' /></assert_contents></output>
+            <param name="input1" value="bigWig"/>
+            <param name="input2" value="https://example.org/sample.bw"/>
+            <param name="input3" value="Sample one"/>
+            <param name="input4" value="Ribosome profile"/>
+            <param name="input5" value="chr1:1-100"/>
+            <output name="output1">
+                <assert_contents>
+                    <has_text text="name=&quot;Sample one&quot;"/>
+                    <has_text text="bigDataUrl=&quot;https://example.org/sample.bw&quot;"/>
+                </assert_contents>
+            </output>
         </test>
     </tests>
     <help>
@@ -37,5 +44,7 @@ Generates a custom track file for GWIPS-viz.
 
 This is facilitates easy exploration of data processed on RiboGalaxy at a Genome wide scale.
     </help>
-<citations><citation type="doi">10.1016/j.jmb.2023.168043</citation></citations>
+    <citations>
+        <citation type="doi">10.1016/j.jmb.2023.168043</citation>
+    </citations>
 </tool>

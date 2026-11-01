@@ -3,32 +3,41 @@
     <requirements>
         <requirement type="package" version="3.37.1">sqlite</requirement>
         <requirement type="package" version="3.0.2">python-intervaltree</requirement>
-
     </requirements>
-    <required_files><include path="create_annotation_sqlite.py" /></required_files>
+    <required_files>
+        <include path="create_annotation_sqlite.py"/>
+    </required_files>
     <command detect_errors="exit_code"><![CDATA[
 python '$__tool_directory__/create_annotation_sqlite.py' '$input1' '$input2' '$input3' $input4 '$input5' '$input6' '$output1'
     ]]></command>
     <inputs>
         <param name="input1" type="text" label="Transcriptome name" help="This will be the outputs filename (No Spaces!)"/>
-        <param name="input2" type="data" format="gff,gff3,gtf" label="Transcriptome Annotation file (GFF/GTF)" />
-        <param name="input3" type="data" format="fasta" label="Transcriptome FASTA File" />
+        <param name="input2" type="data" format="gff,gff3,gtf" label="Transcriptome Annotation file (GFF/GTF)"/>
+        <param name="input3" type="data" format="fasta" label="Transcriptome FASTA File"/>
         <param name="input4" type="integer" min="0" value="0" label="Psuedo UTR length" help="This value will be added used to create UTRs of this length. This is useful when looking at transcriptomes without annotated UTRs"/>
         <param name="input5" type="text" label="Transcript ID" help="An example of a transcript_id from the annotation file, e.g ENST000000123456.1"/>
-        <param name="input6" type="text" label="Gene Name" help="An example of a gene name from the annotation file" />
+        <param name="input6" type="text" label="Gene Name" help="An example of a gene name from the annotation file"/>
     </inputs>
     <outputs>
-       <data name="output1" format="sqlite"/>
+        <data name="output1" format="sqlite"/>
     </outputs>
     <tests>
         <test>
-            <param name="input1" value="test_organism" />
-            <param name="input2" value="small.gtf" ftype="gtf" />
-            <param name="input3" value="small.fasta" />
-            <param name="input4" value="0" />
-            <param name="input5" value="test_tx" />
-            <param name="input6" value="gene1" />
-            <output name="output1" ftype="sqlite"><assert_contents><has_text text="SQLite format 3" /><has_text text="CREATE TABLE transcripts" /><has_text text="CREATE TABLE exons" /><has_text text="test_tx" /><has_text text="ATGAAATAA" /></assert_contents></output>
+            <param name="input1" value="test_organism"/>
+            <param name="input2" value="small.gtf" ftype="gtf"/>
+            <param name="input3" value="small.fasta"/>
+            <param name="input4" value="0"/>
+            <param name="input5" value="test_tx"/>
+            <param name="input6" value="gene1"/>
+            <output name="output1" ftype="sqlite">
+                <assert_contents>
+                    <has_text text="SQLite format 3"/>
+                    <has_text text="CREATE TABLE transcripts"/>
+                    <has_text text="CREATE TABLE exons"/>
+                    <has_text text="test_tx"/>
+                    <has_text text="ATGAAATAA"/>
+                </assert_contents>
+            </output>
         </test>
     </tests>
     <help>
@@ -36,6 +45,7 @@ python '$__tool_directory__/create_annotation_sqlite.py' '$input1' '$input2' '$i
 
     Builds a custom transcirptome annoatation stored in sqlite format for your organism.
     </help>
-    <citations><citation type="doi">10.1093/nar/gkab323</citation></citations>
+    <citations>
+        <citation type="doi">10.1093/nar/gkab323</citation>
+    </citations>
 </tool>
-

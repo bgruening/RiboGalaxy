@@ -5,9 +5,10 @@
         <requirement type="package" version="1.7.0">sqlitedict</requirement>
         <requirement type="package" version="3.37.1">sqlite</requirement>
         <requirement type="package" version="1.15.1">samtools</requirement>
-
     </requirements>
-    <required_files><include path="bam_to_sqlite.py" /></required_files>
+    <required_files>
+        <include path="bam_to_sqlite.py"/>
+    </required_files>
     <command detect_errors="exit_code"><![CDATA[
 python '$__tool_directory__/bam_to_sqlite.py' '$input1'
 #if $refGenomeSource.genomeSource == "builtin":
@@ -18,7 +19,7 @@ python '$__tool_directory__/bam_to_sqlite.py' '$input1'
     '$input3' '$output1'
     ]]></command>
     <inputs>
-        <param name="input1" type="data" format="bam" label="Sorted (samtools -n) BAM file" />
+        <param name="input1" type="data" format="bam" label="Sorted (samtools -n) BAM file"/>
         <conditional name="refGenomeSource">
             <param name="genomeSource" type="select" label="Will you select an annotation file from your history or use a built-in option?">
                 <option value="builtin">Use a built-in SQLITE</option>
@@ -27,28 +28,34 @@ python '$__tool_directory__/bam_to_sqlite.py' '$input1'
             <when value="builtin">
                 <param name="input2_builtin" type="select" format="sqlite" label="Select a SQLITE" help="if your organism of interest is not listed - contact RiboGalaxy team">
                     <options from_data_table="sqlites">
-                        <filter type="sort_by" column="2" />
-                        <validator type="no_options" message="No built-ins are available" />
+                        <filter type="sort_by" column="2"/>
+                        <validator type="no_options" message="No built-ins are available"/>
                     </options>
                 </param>
             </when>
             <when value="history">
-                <param name="input2_file" type="data" format="sqlite" label="SQLITE File" />
+                <param name="input2_file" type="data" format="sqlite" label="SQLITE File"/>
             </when>
         </conditional>
-
-        <param name="input3" type="text" label="Description of this sample" />
+        <param name="input3" type="text" label="Description of this sample"/>
     </inputs>
     <outputs>
-       <data name="output1" format="sqlite"/>
+        <data name="output1" format="sqlite"/>
     </outputs>
     <tests>
         <test>
-            <param name="input1" value="small.bam" />
-            <param name="refGenomeSource|genomeSource" value="history" />
-            <param name="refGenomeSource|input2_file" value="small.annotation.sqlite" />
-            <param name="input3" value="TEST DESCRIPTION" />
-            <output name="output1" ftype="sqlite"><assert_contents><has_text text="SQLite format 3" /><has_text text="CREATE TABLE" /><has_text text="read_lengths" /><has_text text="TEST DESCRIPTION" /></assert_contents></output>
+            <param name="input1" value="small.bam"/>
+            <param name="refGenomeSource|genomeSource" value="history"/>
+            <param name="refGenomeSource|input2_file" value="small.annotation.sqlite"/>
+            <param name="input3" value="TEST DESCRIPTION"/>
+            <output name="output1" ftype="sqlite">
+                <assert_contents>
+                    <has_text text="SQLite format 3"/>
+                    <has_text text="CREATE TABLE"/>
+                    <has_text text="read_lengths"/>
+                    <has_text text="TEST DESCRIPTION"/>
+                </assert_contents>
+            </output>
         </test>
     </tests>
     <help>
@@ -60,6 +67,7 @@ python '$__tool_directory__/bam_to_sqlite.py' '$input1'
         - name-sorted bam file (samtools sort -n)
         - TRIPS-Viz annotation file in SQLITE format.
     </help>
-    <citations><citation type="doi">10.1093/nar/gkab323</citation></citations>
+    <citations>
+        <citation type="doi">10.1093/nar/gkab323</citation>
+    </citations>
 </tool>
-

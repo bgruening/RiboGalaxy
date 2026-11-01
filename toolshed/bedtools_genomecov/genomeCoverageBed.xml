@@ -3,9 +3,9 @@
     <macros>
         <import>macros.xml</import>
     </macros>
-    <expand macro="bio_tools" />
-    <expand macro="requirements" />
-    <expand macro="stdio" />
+    <expand macro="bio_tools"/>
+    <expand macro="requirements"/>
+    <expand macro="stdio"/>
     <command><![CDATA[
 bedtools genomecov
 @GENOME_FILE_COVERAGE@
@@ -40,14 +40,14 @@ $three
         <conditional name="input_type">
             <param name="input_type_select" type="select" label="Input type">
                 <option value="bed">@STD_BEDTOOLS_INPUT_LABEL@</option>
-                <option value="bam" selected='true'>BAM</option>
+                <option value="bam" selected="true">BAM</option>
             </param>
             <when value="bed">
-                <param name="input" argument="-i" type="data" format="@STD_BEDTOOLS_INPUTS@" label="@STD_BEDTOOLS_INPUT_LABEL@ file" />
-                <expand macro="input_conditional_genome_file" />
+                <param name="input" argument="-i" type="data" format="@STD_BEDTOOLS_INPUTS@" label="@STD_BEDTOOLS_INPUT_LABEL@ file"/>
+                <expand macro="input_conditional_genome_file"/>
             </when>
             <when value="bam">
-                <param name="input" argument="-ibam" type="data" format="bam" label="BAM file" />
+                <param name="input" argument="-ibam" type="data" format="bam" label="BAM file"/>
             </when>
         </conditional>
         <conditional name="report">
@@ -56,50 +56,41 @@ $three
                 <option value="hist">Data suiteable for Histogram</option>
             </param>
             <when value="bg">
-                <param name="zero_regions" argument="-bga" type="boolean" truevalue="-bga" falsevalue="" checked="false"
-                    label="Report regions with zero coverage" help="If set, regions without any coverage will also be reported" />
-                <param argument="-scale" type="float" value="1.0"
-                    label="Scale the coverage by a constant factor"
-                    help="Each bedGraph coverage value is multiplied by this factor before being reported. Useful for normalizing coverage by, e.g., reads per million (RPM)." />
+                <param name="zero_regions" argument="-bga" type="boolean" truevalue="-bga" falsevalue="" checked="false" label="Report regions with zero coverage" help="If set, regions without any coverage will also be reported"/>
+                <param argument="-scale" type="float" value="1.0" label="Scale the coverage by a constant factor" help="Each bedGraph coverage value is multiplied by this factor before being reported. Useful for normalizing coverage by, e.g., reads per million (RPM)."/>
             </when>
             <when value="hist">
-                <param argument="-max" type="integer" value="0" label="Specify max depth"
-                    help="Combine all positions with a depth >= max into a single bin in the histogram" />
+                <param argument="-max" type="integer" value="0" label="Specify max depth" help="Combine all positions with a depth &gt;= max into a single bin in the histogram"/>
             </when>
         </conditional>
-        <expand macro="split" />
+        <expand macro="split"/>
         <param argument="-strand" type="select" label="Calculate coverage based on">
             <option value="">both strands combined</option>
             <option value="-strand +">positive strand only</option>
             <option value="-strand -">negative strand only</option>
         </param>
-
-        <param argument="-d" type="boolean" truevalue="-d" falsevalue="" checked="false"
-            label="Report the depth at each genome position with 1-based coordinates" />
-        <param argument="-dz" type="boolean" truevalue="-dz" falsevalue="" checked="false"
-            label="Report the depth at each genome position with 0-based coordinates (takes precedence over 1-based output)" />
-        <param name="five" argument="-5" type="boolean" truevalue="-5" falsevalue="" checked="false"
-            label="Calculate coverage of 5’ positions" help="Instead of entire interval" />
-        <param name="three" argument="-3" type="boolean" truevalue="-3" falsevalue="" checked="false"
-            label="Calculate coverage of 3’ positions" help="Instead of entire interval" />
+        <param argument="-d" type="boolean" truevalue="-d" falsevalue="" checked="false" label="Report the depth at each genome position with 1-based coordinates"/>
+        <param argument="-dz" type="boolean" truevalue="-dz" falsevalue="" checked="false" label="Report the depth at each genome position with 0-based coordinates (takes precedence over 1-based output)"/>
+        <param name="five" argument="-5" type="boolean" truevalue="-5" falsevalue="" checked="false" label="Calculate coverage of 5’ positions" help="Instead of entire interval"/>
+        <param name="three" argument="-3" type="boolean" truevalue="-3" falsevalue="" checked="false" label="Calculate coverage of 3’ positions" help="Instead of entire interval"/>
     </inputs>
     <outputs>
         <data name="output" format="bedgraph">
             <change_format>
-                <when input="d" value="-d" format="tabular" />
-                <when input="dz" value="-dz" format="tabular" />
-                <when input="report.report_select" value="hist" format="tabular" />
+                <when input="d" value="-d" format="tabular"/>
+                <when input="dz" value="-dz" format="tabular"/>
+                <when input="report.report_select" value="hist" format="tabular"/>
             </change_format>
         </data>
     </outputs>
     <tests>
         <test>
-            <param name="input_type|input_type_select" value="bed" />
-            <param name="input_type|input" value="genomeCoverageBed1.bed" ftype="bed" />
-            <param name="input_type|genome_file_opts|genome_file_opts_selector" value="hist" />
-            <param name="input_type|genome_file_opts|genome" value="genomeCoverageBed1.len" ftype="tabular" />
-            <param name="report|report_select" value="hist" />
-            <output name="output" file="genomeCoverageBed_result1.bed" ftype="tabular" />
+            <param name="input_type|input_type_select" value="bed"/>
+            <param name="input_type|input" value="genomeCoverageBed1.bed" ftype="bed"/>
+            <param name="input_type|genome_file_opts|genome_file_opts_selector" value="hist"/>
+            <param name="input_type|genome_file_opts|genome" value="genomeCoverageBed1.len" ftype="tabular"/>
+            <param name="report|report_select" value="hist"/>
+            <output name="output" file="genomeCoverageBed_result1.bed" ftype="tabular"/>
         </test>
     </tests>
     <help><![CDATA[
@@ -170,5 +161,5 @@ BedGraph output will contain five columns:
 
 @REFERENCES@
     ]]></help>
-    <expand macro="citations" />
+    <expand macro="citations"/>
 </tool>

@@ -1,47 +1,50 @@
 <tool id="UMI_riboseq" name="UMIs to Header" version="0.1.9">
-<requirements>
-    <requirement type="package" version="1.79">biopython</requirement>
-</requirements>
-    <required_files><include path="UMI.py" /></required_files>
-<command detect_errors="exit_code"><![CDATA[
+    <requirements>
+        <requirement type="package" version="1.79">biopython</requirement>
+    </requirements>
+    <required_files>
+        <include path="UMI.py"/>
+    </required_files>
+    <command detect_errors="exit_code"><![CDATA[
 python '$__tool_directory__/UMI.py' '$reads' '$output' '$gzip' $five_prime_UMI_length $three_prime_UMI_length
     ]]></command>
-<inputs>
-    <param format="fastq,fastqsanger,fastqsanger.gz" name="reads" type="data" label="fastqsanger,fastqsanger.gz"/>
-    <param name="gzip" type="boolean" truevalue="true" falsevalue="false" checked="True" label="Gzip the outputted FASTQ" />
-    <param name="five_prime_UMI_length" type="integer" min="0" value='2' label="Number of UMI bases at the 5' end" help="2 for McGlincy Ingolia Protocol" />
-    <param name="three_prime_UMI_length" type="integer" min="0" value='5' label="Number of UMI bases at the 3' end" help="5 for McGlincy Ingolia Protocol" />
-
-</inputs>
-<outputs>
-    <data format="fastqsanger.gz" name="output">
-        <change_format><when input="gzip" value="false" format="fastqsanger" /></change_format>
-    </data>
-</outputs>
-<tests>
-    <test>
-        <param name="reads" value="umi.fastq" />
-        <param name="gzip" value="false" />
-        <output name="output" file="umi.expected.fastq" ftype="fastqsanger" />
-    </test>
-    <test>
-        <param name="reads" value="umi.fastq.gz" />
-        <param name="gzip" value="true" />
-        <output name="output" file="umi.expected.fastq" decompress="true" ftype="fastqsanger.gz" />
-    </test>
-    <test>
-        <param name="reads" value="umi.fastq" />
-        <param name="gzip" value="false" />
-        <param name="three_prime_UMI_length" value="0" />
-        <output name="output" file="umi.zero.expected.fastq" ftype="fastqsanger" />
-    </test>
-</tests>
-<help>
+    <inputs>
+        <param format="fastq,fastqsanger,fastqsanger.gz" name="reads" type="data" label="fastqsanger,fastqsanger.gz"/>
+        <param name="gzip" type="boolean" truevalue="true" falsevalue="false" checked="True" label="Gzip the outputted FASTQ"/>
+        <param name="five_prime_UMI_length" type="integer" min="0" value="2" label="Number of UMI bases at the 5' end" help="2 for McGlincy Ingolia Protocol"/>
+        <param name="three_prime_UMI_length" type="integer" min="0" value="5" label="Number of UMI bases at the 3' end" help="5 for McGlincy Ingolia Protocol"/>
+    </inputs>
+    <outputs>
+        <data format="fastqsanger.gz" name="output">
+            <change_format>
+                <when input="gzip" value="false" format="fastqsanger"/>
+            </change_format>
+        </data>
+    </outputs>
+    <tests>
+        <test>
+            <param name="reads" value="umi.fastq"/>
+            <param name="gzip" value="false"/>
+            <output name="output" file="umi.expected.fastq" ftype="fastqsanger"/>
+        </test>
+        <test>
+            <param name="reads" value="umi.fastq.gz"/>
+            <param name="gzip" value="true"/>
+            <output name="output" file="umi.expected.fastq" decompress="true" ftype="fastqsanger.gz"/>
+        </test>
+        <test>
+            <param name="reads" value="umi.fastq"/>
+            <param name="gzip" value="false"/>
+            <param name="three_prime_UMI_length" value="0"/>
+            <output name="output" file="umi.zero.expected.fastq" ftype="fastqsanger"/>
+        </test>
+    </tests>
+    <help>
 <![CDATA[ fastq/fastq.gz are input files with reads containing UMIs (already demultiplexed and adapters are removed).
           The output of the script is fastq/fastq.gz file where UMIs (7nt in total, 5'NN and 3'NNNNN preceding barcode consisting of 5nt) are in header of the read. It is designed for protocol: McGlincy NJ, Ingolia NT. Transcriptome-wide measurement of translation by ribosome profiling. Methods. 2017;126:112-129. doi:10.1016/j.ymeth.2017.05.028 ]]>
 </help>
-<citations>
-<citation type="bibtex"> @misc{FedorovaAD2022, author = {Fedorova Alla}, year = {2022}, title = {UMI_for_riboseq}, publisher = {GitHub}, journal = {GitHub repository}, url = {https://github.com/triasteran/RiboGalaxy_with_ansible/blob/main/toolshed_tools/UMI_riboseq_tool/UMI.py}, }
+    <citations>
+        <citation type="bibtex"> @misc{FedorovaAD2022, author = {Fedorova Alla}, year = {2022}, title = {UMI_for_riboseq}, publisher = {GitHub}, journal = {GitHub repository}, url = {https://github.com/triasteran/RiboGalaxy_with_ansible/blob/main/toolshed_tools/UMI_riboseq_tool/UMI.py}, }
 </citation>
-</citations>
+    </citations>
 </tool>

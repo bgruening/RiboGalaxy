@@ -24,7 +24,7 @@
     ]]>
     </command>
     <inputs>
-        <param name="input1" type="data" format="sam,unsorted.bam,cram" label="BAM File" />
+        <param name="input1" type="data" format="sam,unsorted.bam,cram" label="BAM File"/>
         <conditional name="prim_key_cond">
             <param name="prim_key_select" type="select" label="Primary sort key">
                 <option value="">coordinate</option>
@@ -41,17 +41,17 @@
                     <option value="">coordinate</option>
                     <option value="-n">name (-n)</option>
                 </param>
-           </when>
+            </when>
         </conditional>
         <param name="minhash" type="boolean" argument="-M" truevalue="-M" falsevalue="" checked="false" label="Minhash collation" help="Use minimiser for clustering unaligned/unplaced reads."/>
         <!--<param name="compression" type="integer" argument="-l" optional="True" min="0" max="9" label="compression level" help="0 (uncompressed) to 9 (best)"/>-->
     </inputs>
     <outputs>
-       <data name="output1" format="bam">
+        <data name="output1" format="bam">
             <change_format>
-                <when input="prim_key_cond.prim_key_select" value="" format="bam" />
-                <when input="prim_key_cond.prim_key_select" value="-n" format="qname_sorted.bam" />
-                <when input="prim_key_cond.prim_key_select" value="-t" format="unsorted.bam" />
+                <when input="prim_key_cond.prim_key_select" value="" format="bam"/>
+                <when input="prim_key_cond.prim_key_select" value="-n" format="qname_sorted.bam"/>
+                <when input="prim_key_cond.prim_key_select" value="-t" format="unsorted.bam"/>
             </change_format>
         </data>
     </outputs>
@@ -60,9 +60,12 @@
         <!-- 1) # Pos sort -->
         <test>
             <param name="input1" value="test_input_1_a.bam" ftype="bam"/>
-            <conditional name="prim_key_cond"><param name="prim_key_select" value=""/></conditional><output name="output1" file="pos.sort.expected.bam" ftype="bam" lines_diff="4"/>
+            <conditional name="prim_key_cond">
+                <param name="prim_key_select" value=""/>
+            </conditional>
+            <output name="output1" file="pos.sort.expected.bam" ftype="bam" lines_diff="4"/>
         </test>
-    	<!-- test_cmd($opts, out=>"sort/pos.sort.expected.sam", cmd=>"$$opts{bin}/samtools sort${threads}  $$opts{path}/dat/test_input_1_a.bam -O SAM -o -"); -->
+        <!-- test_cmd($opts, out=>"sort/pos.sort.expected.sam", cmd=>"$$opts{bin}/samtools sort${threads}  $$opts{path}/dat/test_input_1_a.bam -O SAM -o -"); -->
         <!-- 2) # Name sort -->
         <test>
             <param name="input1" value="test_input_1_a.bam" ftype="bam"/>
@@ -71,7 +74,7 @@
             </conditional>
             <output name="output1" file="name.sort.expected.bam" ftype="qname_sorted.bam" lines_diff="4"/>
         </test>
-	    <!-- test_cmd($opts, out=>"sort/name.sort.expected.sam", cmd=>"$$opts{bin}/samtools sort${threads} -n  $$opts{path}/dat/test_input_1_a.bam -O SAM -o -");-->
+        <!-- test_cmd($opts, out=>"sort/name.sort.expected.sam", cmd=>"$$opts{bin}/samtools sort${threads} -n  $$opts{path}/dat/test_input_1_a.bam -O SAM -o -");-->
         <!-- 3) # Tag sort (RG) (considers output and name sorted) -->
         <test>
             <param name="input1" value="test_input_1_a.bam" ftype="bam"/>
@@ -117,7 +120,10 @@
         <!-- 7) tests from old version -->
         <test>
             <param name="input1" value="1.bam" ftype="bam"/>
-            <conditional name="prim_key_cond"><param name="prim_key_select" value=""/></conditional><output name="output1" file="1_sort.bam" ftype="bam" sort="True" lines_diff="4"/>
+            <conditional name="prim_key_cond">
+                <param name="prim_key_select" value=""/>
+            </conditional>
+            <output name="output1" file="1_sort.bam" ftype="bam" sort="True" lines_diff="4"/>
         </test>
         <test>
             <param name="input1" value="1.bam" ftype="bam"/>
@@ -129,11 +135,13 @@
         <!-- 8) test minhash sorting -->
         <test>
             <param name="input1" value="test_input_1_a.bam" ftype="bam"/>
-            <conditional name="prim_key_cond"><param name="prim_key_select" value=""/></conditional><param name="minhash" value="true"/>
+            <conditional name="prim_key_cond">
+                <param name="prim_key_select" value=""/>
+            </conditional>
+            <param name="minhash" value="true"/>
             <output name="output1" file="minhash.expected.bam" ftype="bam" lines_diff="4"/>
         </test>
     </tests>
-
     <help>
 **What it does**
 
