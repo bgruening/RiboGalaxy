@@ -1,4 +1,4 @@
-<tool id="samtools_transcriptome_sort" name="Samtools sort" version="2.0.6" profile="@PROFILE@">
+<tool id="samtools_transcriptome_sort" name="Samtools sort" version="2.0.7" profile="@PROFILE@">
     <description>Sort Alignment Files (SAM/BAM)</description>
     <macros>
         <import>macros.xml</import>
@@ -13,7 +13,7 @@
             ###end if
             $prim_key_cond.prim_key_select
             #if $prim_key_cond.prim_key_select == '-t':
-                $prim_key_cond.tag
+                '$prim_key_cond.tag'
                 $prim_key_cond.sec_key_select
             #end if
             $minhash
@@ -34,7 +34,9 @@
             <when value=""/>
             <when value="-n"/>
             <when value="-t">
-                <param name="tag" type="text" optional="false" argument="-t" label="Alignment tag"/>
+                <param name="tag" type="text" optional="false" argument="-t" label="Alignment tag">
+                    <validator type="regex" message="Use a two-character SAM tag">^[A-Za-z][A-Za-z0-9]$</validator>
+                </param>
                 <param name="sec_key_select" type="select" label="Secondary sort key">
                     <option value="">coordinate</option>
                     <option value="-n">name (-n)</option>
@@ -57,13 +59,13 @@
         <!-- tests from https://github.com/samtools/samtools/blob/9ce8c64493f7ea3fa69bc5c1ac980b1a8e3dcf1f/test/test.pl#L2464 -->
         <!-- 1) # Pos sort -->
         <test>
-            <param name="input1" value="test_input_1_a.bam" ftype="bam" />
-            <output name="output1" file="pos.sort.expected.bam" ftype="bam" lines_diff="4" />
+            <param name="input1" value="test_input_1_a.bam" ftype="bam"/>
+            <conditional name="prim_key_cond"><param name="prim_key_select" value=""/></conditional><output name="output1" file="pos.sort.expected.bam" ftype="bam" lines_diff="4"/>
         </test>
     	<!-- test_cmd($opts, out=>"sort/pos.sort.expected.sam", cmd=>"$$opts{bin}/samtools sort${threads}  $$opts{path}/dat/test_input_1_a.bam -O SAM -o -"); -->
         <!-- 2) # Name sort -->
         <test>
-            <param name="input1" value="test_input_1_a.bam" ftype="bam" />
+            <param name="input1" value="test_input_1_a.bam" ftype="bam"/>
             <conditional name="prim_key_cond">
                 <param name="prim_key_select" value="-n"/>
             </conditional>
@@ -72,7 +74,7 @@
 	    <!-- test_cmd($opts, out=>"sort/name.sort.expected.sam", cmd=>"$$opts{bin}/samtools sort${threads} -n  $$opts{path}/dat/test_input_1_a.bam -O SAM -o -");-->
         <!-- 3) # Tag sort (RG) (considers output and name sorted) -->
         <test>
-            <param name="input1" value="test_input_1_a.bam" ftype="bam" />
+            <param name="input1" value="test_input_1_a.bam" ftype="bam"/>
             <conditional name="prim_key_cond">
                 <param name="prim_key_select" value="-t"/>
                 <param name="tag" value="RG"/>
@@ -82,7 +84,7 @@
         <!--test_cmd($opts, out=>"sort/tag.rg.sort.expected.sam", cmd=>"$$opts{bin}/samtools sort${threads} -t RG  $$opts{path}/dat/test_input_1_a.bam -O SAM -o -");-->
         <!-- 4) # Tag sort (RG); secondary by name -->
         <test>
-            <param name="input1" value="test_input_1_a.bam" ftype="bam" />
+            <param name="input1" value="test_input_1_a.bam" ftype="bam"/>
             <conditional name="prim_key_cond">
                 <param name="prim_key_select" value="-t"/>
                 <param name="tag" value="RG"/>
@@ -93,7 +95,7 @@
         <!--test_cmd($opts, out=>"sort/tag.rg.n.sort.expected.sam", cmd=>"$$opts{bin}/samtools sort${threads} -n -t RG  $$opts{path}/dat/test_input_1_a.bam -O SAM -o -");-->
         <!-- 5) # Tag sort (AS) -->
         <test>
-            <param name="input1" value="test_input_1_a.bam" ftype="bam" />
+            <param name="input1" value="test_input_1_a.bam" ftype="bam"/>
             <conditional name="prim_key_cond">
                 <param name="prim_key_select" value="-t"/>
                 <param name="tag" value="AS"/>
@@ -104,7 +106,7 @@
         <!--test_cmd($opts, out=>"sort/tag.as.sort.expected.sam", cmd=>"$$opts{bin}/samtools sort${threads} -t AS $$opts{path}/dat/test_input_1_d.sam -O SAM -o -");-->
         <!-- 6) # Tag sort (FI) -->
         <test>
-            <param name="input1" value="test_input_1_a.bam" ftype="bam" />
+            <param name="input1" value="test_input_1_a.bam" ftype="bam"/>
             <conditional name="prim_key_cond">
                 <param name="prim_key_select" value="-t"/>
                 <param name="tag" value="FI"/>
@@ -114,11 +116,11 @@
         <!--test_cmd($opts, out=>"sort/tag.fi.sort.expected.sam", cmd=>"$$opts{bin}/samtools sort${threads} -t FI $$opts{path}/dat/test_input_1_d.sam -O SAM -o -");-->
         <!-- 7) tests from old version -->
         <test>
-            <param name="input1" value="1.bam" ftype="bam" />
-            <output name="output1" file="1_sort.bam" ftype="bam" sort="True" lines_diff="4"/>
+            <param name="input1" value="1.bam" ftype="bam"/>
+            <conditional name="prim_key_cond"><param name="prim_key_select" value=""/></conditional><output name="output1" file="1_sort.bam" ftype="bam" sort="True" lines_diff="4"/>
         </test>
         <test>
-            <param name="input1" value="1.bam" ftype="bam" />
+            <param name="input1" value="1.bam" ftype="bam"/>
             <conditional name="prim_key_cond">
                 <param name="prim_key_select" value="-n"/>
             </conditional>
@@ -126,11 +128,12 @@
         </test>
         <!-- 8) test minhash sorting -->
         <test>
-            <param name="input1" value="test_input_1_a.bam" ftype="bam" />
-            <param name="minhash" value="true" />
-            <output name="output1" file="minhash.expected.bam" ftype="bam" lines_diff="4" />
+            <param name="input1" value="test_input_1_a.bam" ftype="bam"/>
+            <conditional name="prim_key_cond"><param name="prim_key_select" value=""/></conditional><param name="minhash" value="true"/>
+            <output name="output1" file="minhash.expected.bam" ftype="bam" lines_diff="4"/>
         </test>
     </tests>
+
     <help>
 **What it does**
 

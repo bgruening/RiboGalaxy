@@ -1,157 +1,158 @@
-<tool id="bowtie_transcriptomic_wrapper" name="Bowtie Transcriptome Alignment" version="1.5.0">
+<tool id="bowtie_transcriptomic_wrapper" name="Bowtie Transcriptome Alignment" version="1.5.1">
   <description>Align to Transcriptome using Bowtie</description>
   <requirements>
+    <requirement type="package" version="3.6">python</requirement>
     <requirement type="package" version="1.2.0">bowtie</requirement>
-    <requirement type="package" version="1.13">samtools</requirement>
 
   </requirements>
+    <required_files><include path="bowtie_transcriptome_wrapper.py" /></required_files>
   <version_command>bowtie --version</version_command>
-  <command>
+  <command detect_errors="exit_code">
     python '$__tool_directory__/bowtie_transcriptome_wrapper.py'
       ## Set number of threads
       --threads="\${GALAXY_SLOTS:-4}"
       ## Outputs
-      --output="${output}"
+      --output='${output}'
       #if str( $singlePaired.sPaired ) == "single"
         #if $output_unmapped_reads_l
-          --output_unmapped_reads="${output_unmapped_reads_l}"
+          --output_unmapped_reads='${output_unmapped_reads_l}'
         #end if
         #if $output_suppressed_reads_l
-          --output_suppressed_reads="${output_suppressed_reads_l}"
+          --output_suppressed_reads='${output_suppressed_reads_l}'
         #end if
-        --galaxy_input_format="${singlePaired.sInput1.ext}"
+        --galaxy_input_format='${singlePaired.sInput1.ext}'
       #else
         #if $output_unmapped_reads_l and $output_unmapped_reads_r
-          --output_unmapped_reads_l="${output_unmapped_reads_l}"
-          --output_unmapped_reads_r="${output_unmapped_reads_r}"
+          --output_unmapped_reads_l='${output_unmapped_reads_l}'
+          --output_unmapped_reads_r='${output_unmapped_reads_r}'
         #end if
-        #if $output_suppressed_reads_l and $output_suppressed_reads_l
-          --output_suppressed_reads_l="${output_suppressed_reads_l}"
-          --output_suppressed_reads_r="${output_suppressed_reads_r}"
+        #if $output_suppressed_reads_l and $output_suppressed_reads_r
+          --output_suppressed_reads_l='${output_suppressed_reads_l}'
+          --output_suppressed_reads_r='${output_suppressed_reads_r}'
         #end if
-        --galaxy_input_format="${singlePaired.pInput1.ext}"
+        --galaxy_input_format='${singlePaired.pInput1.ext}'
       #end if
       ## Inputs
       --dataType="solexa" ##this indicates that nucleotide base space is used in the wrapper
-      --suppressHeader="${suppressHeader}"
-      --genomeSource="${refGenomeSource.genomeSource}"
+      --suppressHeader='${suppressHeader}'
+      --genomeSource='${refGenomeSource.genomeSource}'
       #if $refGenomeSource.genomeSource == "history":
         ##index already exists
         #if $refGenomeSource.ownFile.extension.startswith( 'bowtie_' ):
           ##user previously built
-          --ref="${refGenomeSource.ownFile.extra_files_path}/${refGenomeSource.ownFile.metadata.base_name}"
+          --ref='${refGenomeSource.ownFile.extra_files_path}/${refGenomeSource.ownFile.metadata.base_name}'
           --do_not_build_index
         #else:
           ##build index on the fly
-          --ref="${refGenomeSource.ownFile}"
-          --indexSettings="${refGenomeSource.indexParams.indexSettings}"
+          --ref='${refGenomeSource.ownFile}'
+          --indexSettings='${refGenomeSource.indexParams.indexSettings}'
           #if $refGenomeSource.indexParams.indexSettings == "indexFull":
-            --iautoB="${refGenomeSource.indexParams.autoBehavior.autoB}"
+            --iautoB='${refGenomeSource.indexParams.autoBehavior.autoB}'
             #if $refGenomeSource.indexParams.autoBehavior.autoB == "set":
-              --ipacked="${refGenomeSource.indexParams.autoBehavior.packed}"
-              --ibmax="${refGenomeSource.indexParams.autoBehavior.bmax}"
-              --ibmaxdivn="${refGenomeSource.indexParams.autoBehavior.bmaxdivn}"
-              --idcv="${refGenomeSource.indexParams.autoBehavior.dcv}"
+              --ipacked='${refGenomeSource.indexParams.autoBehavior.packed}'
+              --ibmax='${refGenomeSource.indexParams.autoBehavior.bmax}'
+              --ibmaxdivn='${refGenomeSource.indexParams.autoBehavior.bmaxdivn}'
+              --idcv='${refGenomeSource.indexParams.autoBehavior.dcv}'
             #end if
-            --inodc="${refGenomeSource.indexParams.nodc}"
-            --inoref="${refGenomeSource.indexParams.noref}"
-            --ioffrate="${refGenomeSource.indexParams.offrate}"
-            --iftab="${refGenomeSource.indexParams.ftab}"
-            --intoa="${refGenomeSource.indexParams.ntoa}"
-            --iendian="${refGenomeSource.indexParams.endian}"
-            --iseed="${refGenomeSource.indexParams.seed}"
+            --inodc='${refGenomeSource.indexParams.nodc}'
+            --inoref='${refGenomeSource.indexParams.noref}'
+            --ioffrate='${refGenomeSource.indexParams.offrate}'
+            --iftab='${refGenomeSource.indexParams.ftab}'
+            --intoa='${refGenomeSource.indexParams.ntoa}'
+            --iendian='${refGenomeSource.indexParams.endian}'
+            --iseed='${refGenomeSource.indexParams.seed}'
           #end if
         #end if
       #else
         ##use pre-built index
-        --ref="${refGenomeSource.index.fields.path}"
+        --ref='${refGenomeSource.index.fields.path}'
       #end if
-      --paired="${singlePaired.sPaired}"
+      --paired='${singlePaired.sPaired}'
       #if $singlePaired.sPaired == "single":
-        --input1="${singlePaired.sInput1}"
-        --params="${singlePaired.sParams.sSettingsType}"
+        --input1='${singlePaired.sInput1}'
+        --params='${singlePaired.sParams.sSettingsType}'
         #if $singlePaired.sParams.sSettingsType == "full":
-          --skip="${singlePaired.sParams.sSkip}"
-          --alignLimit="${singlePaired.sParams.sAlignLimit}"
-          --trimH="${singlePaired.sParams.sTrimH}"
-          --trimL="${singlePaired.sParams.sTrimL}"
+          --skip='${singlePaired.sParams.sSkip}'
+          --alignLimit='${singlePaired.sParams.sAlignLimit}'
+          --trimH='${singlePaired.sParams.sTrimH}'
+          --trimL='${singlePaired.sParams.sTrimL}'
           #if $singlePaired.sParams.alignModeOption.alignMode == 'nMode'
-            --mismatchSeed="${singlePaired.sParams.alignModeOption.sMismatchSeed}"
-            --mismatchQual="${singlePaired.sParams.alignModeOption.sMismatchQual}"
-            --seedLen="${singlePaired.sParams.alignModeOption.sSeedLen}"
-            --rounding="${singlePaired.sParams.alignModeOption.sRounding}"
+            --mismatchSeed='${singlePaired.sParams.alignModeOption.sMismatchSeed}'
+            --mismatchQual='${singlePaired.sParams.alignModeOption.sMismatchQual}'
+            --seedLen='${singlePaired.sParams.alignModeOption.sSeedLen}'
+            --rounding='${singlePaired.sParams.alignModeOption.sRounding}'
           #else
-            --maxMismatches="${singlePaired.sParams.alignModeOption.maxMismatches}"
+            --maxMismatches='${singlePaired.sParams.alignModeOption.maxMismatches}'
           #end if
-          --forwardAlign="${singlePaired.sParams.sForwardAlign}"
-          --reverseAlign="${singlePaired.sParams.sReverseAlign}"
-          --tryHard="${singlePaired.sParams.sBestOption.sTryHardOption.sTryHard}"
-          --allValAligns="${singlePaired.sParams.sAllValAlignsOption.sAllValAligns}"
+          --forwardAlign='${singlePaired.sParams.sForwardAlign}'
+          --reverseAlign='${singlePaired.sParams.sReverseAlign}'
+          --tryHard='${singlePaired.sParams.sBestOption.sTryHardOption.sTryHard}'
+          --allValAligns='${singlePaired.sParams.sAllValAlignsOption.sAllValAligns}'
           #if $singlePaired.sParams.sAllValAlignsOption.sAllValAligns == "noAllValAligns"
-            --valAlign="${singlePaired.sParams.sAllValAlignsOption.sValAlign}"
+            --valAlign='${singlePaired.sParams.sAllValAlignsOption.sValAlign}'
           #end if
-          --suppressAlign="${singlePaired.sParams.sSuppressAlign}"
-          --best="${singlePaired.sParams.sBestOption.sBest}"
+          --suppressAlign='${singlePaired.sParams.sSuppressAlign}'
+          --best='${singlePaired.sParams.sBestOption.sBest}'
           #if $singlePaired.sParams.sBestOption.sBest == "doBest":
-            --strata="${singlePaired.sParams.sBestOption.sdStrata}"
+            --strata='${singlePaired.sParams.sBestOption.sdStrata}'
             #if $singlePaired.sParams.sBestOption.sTryHardOption.sTryHard == "noTryHard"
-              --maxBacktracks="${singlePaired.sParams.sBestOption.sTryHardOption.sdMaxBacktracks}"
+              --maxBacktracks='${singlePaired.sParams.sBestOption.sTryHardOption.sdMaxBacktracks}'
             #end if
           #else:
             #if $singlePaired.sParams.sBestOption.sTryHardOption.sTryHard == "noTryHard"
-              --maxBacktracks="${singlePaired.sParams.sBestOption.sTryHardOption.snMaxBacktracks}"
+              --maxBacktracks='${singlePaired.sParams.sBestOption.sTryHardOption.snMaxBacktracks}'
             #end if
           #end if
-          --offrate="${singlePaired.sParams.sOffrate}"
-          --seed="${singlePaired.sParams.sSeed}"
+          --offrate='${singlePaired.sParams.sOffrate}'
+          --seed='${singlePaired.sParams.sSeed}'
         #end if
       #else:
-        --input1="${singlePaired.pInput1}"
-        --input2="${singlePaired.pInput2}"
-        --maxInsert="${singlePaired.pMaxInsert}"
-        --mateOrient="${singlePaired.pMateOrient}"
-        --params="${singlePaired.pParams.pSettingsType}"
+        --input1='${singlePaired.pInput1}'
+        --input2='${singlePaired.pInput2}'
+        --maxInsert='${singlePaired.pMaxInsert}'
+        --mateOrient='${singlePaired.pMateOrient}'
+        --params='${singlePaired.pParams.pSettingsType}'
         #if $singlePaired.pParams.pSettingsType == "full":
-          --skip="${singlePaired.pParams.pSkip}"
-          --alignLimit="${singlePaired.pParams.pAlignLimit}"
-          --trimH="${singlePaired.pParams.pTrimH}"
-          --trimL="${singlePaired.pParams.pTrimL}"
+          --skip='${singlePaired.pParams.pSkip}'
+          --alignLimit='${singlePaired.pParams.pAlignLimit}'
+          --trimH='${singlePaired.pParams.pTrimH}'
+          --trimL='${singlePaired.pParams.pTrimL}'
           #if $singlePaired.pParams.alignModeOption.alignMode == 'nMode'
-            --mismatchSeed="${singlePaired.pParams.alignModeOption.pMismatchSeed}"
-            --mismatchQual="${singlePaired.pParams.alignModeOption.pMismatchQual}"
-            --seedLen="${singlePaired.pParams.alignModeOption.pSeedLen}"
-            --rounding="${singlePaired.pParams.alignModeOption.pRounding}"
+            --mismatchSeed='${singlePaired.pParams.alignModeOption.pMismatchSeed}'
+            --mismatchQual='${singlePaired.pParams.alignModeOption.pMismatchQual}'
+            --seedLen='${singlePaired.pParams.alignModeOption.pSeedLen}'
+            --rounding='${singlePaired.pParams.alignModeOption.pRounding}'
           #else
-            --maxMismatches="${singlePaired.pParams.alignModeOption.maxMismatches}"
+            --maxMismatches='${singlePaired.pParams.alignModeOption.maxMismatches}'
           #end if
-          --minInsert="${singlePaired.pParams.pMinInsert}"
-          --forwardAlign="${singlePaired.pParams.pForwardAlign}"
-          --reverseAlign="${singlePaired.pParams.pReverseAlign}"
-          --tryHard="${singlePaired.pParams.pBestOption.pTryHardOption.pTryHard}"
-          --allValAligns="${singlePaired.pParams.pAllValAlignsOption.pAllValAligns}"
+          --minInsert='${singlePaired.pParams.pMinInsert}'
+          --forwardAlign='${singlePaired.pParams.pForwardAlign}'
+          --reverseAlign='${singlePaired.pParams.pReverseAlign}'
+          --tryHard='${singlePaired.pParams.pBestOption.pTryHardOption.pTryHard}'
+          --allValAligns='${singlePaired.pParams.pAllValAlignsOption.pAllValAligns}'
           #if $singlePaired.pParams.pAllValAlignsOption.pAllValAligns == "noAllValAligns"
-            --valAlign="${singlePaired.pParams.pAllValAlignsOption.pValAlign}"
+            --valAlign='${singlePaired.pParams.pAllValAlignsOption.pValAlign}'
           #end if
-          --suppressAlign="${singlePaired.pParams.pSuppressAlign}"
-          --best="${singlePaired.pParams.pBestOption.pBest}"
+          --suppressAlign='${singlePaired.pParams.pSuppressAlign}'
+          --best='${singlePaired.pParams.pBestOption.pBest}'
           #if $singlePaired.pParams.pBestOption.pBest == "doBest":
-            --strata="${singlePaired.pParams.pBestOption.pdStrata}"
+            --strata='${singlePaired.pParams.pBestOption.pdStrata}'
             #if $singlePaired.pParams.pBestOption.pTryHardOption.pTryHard == "noTryHard"
-              --maxAlignAttempt="${singlePaired.pParams.pBestOption.pTryHardOption.pMaxAlignAttempt}"
-              --maxBacktracks="${singlePaired.pParams.pBestOption.pTryHardOption.pdMaxBacktracks}"
+              --maxAlignAttempt='${singlePaired.pParams.pBestOption.pTryHardOption.pMaxAlignAttempt}'
+              --maxBacktracks='${singlePaired.pParams.pBestOption.pTryHardOption.pdMaxBacktracks}'
             #end if
           #else:
             #if $singlePaired.pParams.pBestOption.pTryHardOption.pTryHard == "noTryHard"
-              --maxAlignAttempt="${singlePaired.pParams.pBestOption.pTryHardOption.pMaxAlignAttempt}"
-              --maxBacktracks="${singlePaired.pParams.pBestOption.pTryHardOption.pnMaxBacktracks}"
+              --maxAlignAttempt='${singlePaired.pParams.pBestOption.pTryHardOption.pMaxAlignAttempt}'
+              --maxBacktracks='${singlePaired.pParams.pBestOption.pTryHardOption.pnMaxBacktracks}'
             #end if
           #end if
-          --offrate="${singlePaired.pParams.pOffrate}"
-          --seed="${singlePaired.pParams.pSeed}"
+          --offrate='${singlePaired.pParams.pOffrate}'
+          --seed='${singlePaired.pParams.pSeed}'
         #end if
       #end if
       #if $save_mapping_stats
-        --output_mapping_stats="$mapping_stats"
+        --output_mapping_stats='$mapping_stats'
       #end if
   </command>
   <inputs>
@@ -316,11 +317,6 @@
       <when value="paired">
         <param name="pInput1" type="data" format="fastq,fastqsanger,fastqillumina,fastqsolexa" label="Forward FASTQ file" help="Must have ASCII encoded quality scores"/>
         <param name="pInput2" type="data" format="fastq,fastqsanger,fastqillumina,fastqsolexa" label="Reverse FASTQ file" help="File format must match the Forward FASTQ file">
-            <options options_filter_attribute="ext" from_parameter="tool.app.datatypes_registry.datatypes_by_extension" transform_lines="obj.keys()">
-               <column name="name" index="0"/>
-               <column name="value" index="0"/>
-               <filter type="param_value" ref="pInput1" ref_attribute="ext" column="0"/>
-           </options>
         </param>
         <param name="pMaxInsert" type="integer" value="1000" label="Maximum insert size for valid paired-end alignments (-X)" />
         <param name="pMateOrient" type="select" label="The upstream/downstream mate orientation for valid paired-end alignment against the forward reference strand (--fr/--rf/--ff)">
@@ -354,7 +350,7 @@
                 </param>
               </when>
               <when value="vMode">
-                <param name="maxMismatches" type="integer" value="" min="0" max="3" label="Maximum number of mismatches (-v)" help="May be 0, 1, 2, or 3" />
+                <param name="maxMismatches" type="integer" value="3" min="0" max="3" label="Maximum number of mismatches (-v)" help="May be 0, 1, 2, or 3" />
                 <param name="pSeedLen" type="integer" value="25" min="5" label="Seed length (-l)" help="Minimum value is 5" />
               </when>
             </conditional>
@@ -541,254 +537,30 @@
     </data>
   </outputs>
   <tests>
-    <test>
-      <!--
-      Bowtie command:
-      bowtie -q -p 4 -S +sam-nohead chrM_base test-data/bowtie_in2.fastqsanger > bowtie_out6_u.sam
-      sort bowtie_out6_u.sam > bowtie_out6.sam
-      -p is the number of threads. You need to replace the + with 2 dashes.
-      chrM_base needs to be the base location/name of the index files.
-      -->
-      <param name="genomeSource" value="indexed" />
-      <!-- this is the backwards-compatible "unique value" for this index, not an actual path -->
-      <param name="index" value="equCab2chrM" />
-      <param name="sPaired" value="single" />
-      <param name="sInput1" ftype="fastqsanger" value="bowtie_in2.fastqsanger" />
-      <param name="sSettingsType" value="preSet" />
-      <param name="suppressHeader" value="true" />
-      <output name="output" ftype="sam" file="bowtie_out6.sam" sort="True">
-        <metadata name="dbkey" value="equCab2" />
-      </output>
-    </test>
-    <test>
-      <!--
-      Bowtie command:
-      bowtie-build -f test-data/phiX.fasta phiX_base
-      bowtie -q -X 1000 +ff -p 4 -S +sam-nohead -n 2 -e 70 -l 28 +pairtries 100 +maxbts 800 +best +un bowtie_out8_u.fastq phiX_base -1 test-data/bowtie_in5.fastqsanger -2 test-data/bowtie_in6.fastqsanger > bowtie_out7_u.sam
-      sort bowtie_out7_u.sam > bowtie_out7.sam
-      sort bowtie_out8_u_1.sam > bowtie_out8_1.sam
-      sort bowtie_out8_u_2.sam > bowtie_out8_2.sam
-      Then also need to modify bowtie_out8_1.sam and bowtie_out8_2.sam so that all @ lines come before sequence lines.
-      -p is the number of threads. You need to replace the + with 2 dashes.
-      The two unmapped output files will be named bowtie_out8_1.fastq and bowtie_out8_2.fastq.
-      chrM_base is the index files' location/base name.
-      -->
-      <param name="genomeSource" value="history" />
-      <param name="ownFile" value="phiX.fasta" />
-      <param name="indexSettings" value="indexPreSet" />
-      <param name="sPaired" value="paired" />
-      <param name="pInput1" ftype="fastqsanger" value="bowtie_in5.fastqsanger" />
-      <param name="pInput2" ftype="fastqsanger" value="bowtie_in6.fastqsanger" />
-      <param name="pMaxInsert" value="1000" />
-      <param name="pMateOrient" value="ff" />
-      <param name="pSettingsType" value="full" />
-      <param name="pSkip" value="0" />
-      <param name="pAlignLimit" value="-1" />
-      <param name="pTrimH" value="0" />
-      <param name="pTrimL" value="0" />
-      <param name="alignMode" value="nMode" />
-      <param name="pMismatchSeed" value="2" />
-      <param name="pMismatchQual" value="70" />
-      <param name="pSeedLen" value="28" />
-      <param name="pRounding" value="round" />
-      <param name="pMinInsert" value="0" />
-      <param name="pMaxAlignAttempt" value="100" />
-      <param name="pForwardAlign" value="forward" />
-      <param name="pReverseAlign" value="reverse" />
-      <param name="pTryHard" value="noTryHard" />
-      <param name="pValAlign" value="1" />
-      <param name="pAllValAligns" value="noAllValAligns" />
-      <param name="pSuppressAlign" value="-1" />
-      <param name="pUnmappedFile" value="true" />
-      <param name="pMaxFile" value="false" />
-      <param name="pBest" value="doBest" />
-      <param name="pdMaxBacktracks" value="800" />
-      <param name="pdStrata" value="noStrata" />
-      <param name="pOffrate" value="-1" />
-      <param name="pSeed" value="-1" />
-      <param name="suppressHeader" value="true" />
-      <output name="output" ftype="sam" file="bowtie_out7.sam" sort="True" />
-      <output name="output_unmapped_reads_l" ftype="fastqsanger" file="bowtie_out8_1.fastq" sort="True" />
-      <output name="output_unmapped_reads_r" ftype="fastqsanger" file="bowtie_out8_2.fastq" sort="True" />
-    </test>
-    <!-- start testing of non-sanger variant fastq reads -->
-    <test>
-      <param name="genomeSource" value="history" />
-      <param name="ownFile" value="phiX.fasta" />
-      <param name="indexSettings" value="indexPreSet" />
-      <param name="sPaired" value="paired" />
-      <param name="pInput1" ftype="fastqillumina" value="bowtie_in5.fastqillumina" />
-      <param name="pInput2" ftype="fastqillumina" value="bowtie_in6.fastqillumina" />
-      <param name="pMaxInsert" value="1000" />
-      <param name="pMateOrient" value="ff" />
-      <param name="pSettingsType" value="full" />
-      <param name="pSkip" value="0" />
-      <param name="pAlignLimit" value="-1" />
-      <param name="pTrimH" value="0" />
-      <param name="pTrimL" value="0" />
-      <param name="alignMode" value="nMode" />
-      <param name="pMismatchSeed" value="2" />
-      <param name="pMismatchQual" value="70" />
-      <param name="pSeedLen" value="28" />
-      <param name="pRounding" value="round" />
-      <param name="pMinInsert" value="0" />
-      <param name="pMaxAlignAttempt" value="100" />
-      <param name="pForwardAlign" value="forward" />
-      <param name="pReverseAlign" value="reverse" />
-      <param name="pTryHard" value="noTryHard" />
-      <param name="pValAlign" value="1" />
-      <param name="pAllValAligns" value="noAllValAligns" />
-      <param name="pSuppressAlign" value="-1" />
-      <param name="pUnmappedFile" value="true" />
-      <param name="pMaxFile" value="false" />
-      <param name="pBest" value="doBest" />
-      <param name="pdMaxBacktracks" value="800" />
-      <param name="pdStrata" value="noStrata" />
-      <param name="pOffrate" value="-1" />
-      <param name="pSeed" value="-1" />
-      <param name="suppressHeader" value="true" />
-      <output name="output" ftype="sam" file="bowtie_out7.sam" sort="True" />
-      <output name="output_unmapped_reads_l" ftype="fastqillumina" file="bowtie_out8_1.fastqillumina.sorted" sort="True" />
-      <output name="output_unmapped_reads_r" ftype="fastqillumina" file="bowtie_out8_2.fastqillumina.sorted" sort="True" />
-    </test>
-    <test>
-      <param name="genomeSource" value="history" />
-      <param name="ownFile" value="phiX.fasta" />
-      <param name="indexSettings" value="indexPreSet" />
-      <param name="sPaired" value="paired" />
-      <param name="pInput1" ftype="fastqsolexa" value="bowtie_in5.fastqsolexa" />
-      <param name="pInput2" ftype="fastqsolexa" value="bowtie_in6.fastqsolexa" />
-      <param name="pMaxInsert" value="1000" />
-      <param name="pMateOrient" value="ff" />
-      <param name="pSettingsType" value="full" />
-      <param name="pSkip" value="0" />
-      <param name="pAlignLimit" value="-1" />
-      <param name="pTrimH" value="0" />
-      <param name="pTrimL" value="0" />
-      <param name="alignMode" value="nMode" />
-      <param name="pMismatchSeed" value="2" />
-      <param name="pMismatchQual" value="70" />
-      <param name="pSeedLen" value="28" />
-      <param name="pRounding" value="round" />
-      <param name="pMinInsert" value="0" />
-      <param name="pMaxAlignAttempt" value="100" />
-      <param name="pForwardAlign" value="forward" />
-      <param name="pReverseAlign" value="reverse" />
-      <param name="pTryHard" value="noTryHard" />
-      <param name="pValAlign" value="1" />
-      <param name="pAllValAligns" value="noAllValAligns" />
-      <param name="pSuppressAlign" value="-1" />
-      <param name="pUnmappedFile" value="true" />
-      <param name="pMaxFile" value="false" />
-      <param name="pBest" value="doBest" />
-      <param name="pdMaxBacktracks" value="800" />
-      <param name="pdStrata" value="noStrata" />
-      <param name="pOffrate" value="-1" />
-      <param name="pSeed" value="-1" />
-      <param name="suppressHeader" value="true" />
-      <output name="output" ftype="sam" file="bowtie_out7.sam" sort="True" />
-      <output name="output_unmapped_reads_l" ftype="fastqsolexa" file="bowtie_out8_1.fastqsolexa.sorted" sort="True" />
-      <output name="output_unmapped_reads_r" ftype="fastqsolexa" file="bowtie_out8_2.fastqsolexa.sorted" sort="True" />
-    </test>
-    <!-- end testing of non-sanger variant fastq reads -->
-    <test>
-      <!--
-      Bowtie command:
-      bowtie -q -p 4 -S +sam-nohead -n 2 -e 70 -l 28 -y -k 1 chrM_base test-data/bowtie_in2.fastqsanger > bowtie_out9_u.sam
-      sort bowtie_out9_u.sam > bowtie_out9.sam
-      -p is the number of threads. You need to replace the + with 2 dashes.
-      chrM_base is the index files' location/base name.
-      -->
-      <param name="genomeSource" value="indexed" />
-      <!-- this is the backwards-compatible "unique value" for this index, not an actual path -->
-      <param name="index" value="equCab2chrM" />
-      <param name="sPaired" value="single" />
-      <param name="sInput1" ftype="fastqsanger" value="bowtie_in2.fastqsanger" />
-      <param name="sSettingsType" value="full" />
-      <param name="sSkip" value="0" />
-      <param name="sAlignLimit" value="-1" />
-      <param name="sTrimH" value="0" />
-      <param name="sTrimL" value="0" />
-      <param name="alignMode" value="nMode" />
-      <param name="sMismatchSeed" value="2" />
-      <param name="sMismatchQual" value="70" />
-      <param name="sSeedLen" value="28" />
-      <param name="sRounding" value="round" />
-      <param name="sForwardAlign" value="forward" />
-      <param name="sReverseAlign" value="reverse" />
-      <param name="sTryHard" value="doTryHard" />
-      <param name="sValAlign" value="1" />
-      <param name="sAllValAligns" value="noAllValAligns" />
-      <param name="sSuppressAlign" value="-1" />
-      <param name="sUnmappedFile" value="false" />
-      <param name="sMaxFile" value="false" />
-      <param name="sBest" value="noBest" />
-      <param name="sOffrate" value="-1" />
-      <param name="sSeed" value="-1" />
-      <param name="suppressHeader" value="true" />
-      <output name="output" ftype="sam" file="bowtie_out9.sam" sort="True">
-        <metadata name="dbkey" value="equCab2" />
-      </output>
-    </test>
-    <test>
-      <!--
-      Bowtie command:
-      bowtie-build +offrate 5 +ftabchars 10 +little -f test-data/phiX.fasta phiX_base
-      bowtie -q -X 1000 +ff -p 4 -S +sam-nohead phiX_base -1 test-data/bowtie_in5.fastqsanger -2 test-data/bowtie_in6.fastqsanger > bowtie_out10_u.sam
-      sort bowtie_out10_u.sam > bowtie_out10.sam
-      -p is the number of threads. You need to replace the + with 2 dashes.
-      chrM_base is the index files' location/base name.
-      -->
-      <param name="genomeSource" value="history" />
-      <param name="ownFile" value="phiX.fasta" />
-      <param name="indexSettings" value="indexFull" />
-      <param name="autoB" value="auto" />
-      <param name="nodc" value="dc" />
-      <param name="noref" value="ref" />
-      <param name="offrate" value="5" />
-      <param name="ftab" value="10" />
-      <param name="ntoa" value="no" />
-      <param name="endian" value="little" />
-      <param name="seed" value="-1" />
-      <param name="sPaired" value="paired" />
-      <param name="pInput1" ftype="fastqsanger" value="bowtie_in5.fastqsanger" />
-      <param name="pInput2" ftype="fastqsanger" value="bowtie_in6.fastqsanger" />
-      <param name="pMaxInsert" value="1000" />
-      <param name="pMateOrient" value="ff" />
-      <param name="pSettingsType" value="preSet" />
-      <param name="suppressHeader" value="true" />
-      <output name="output" ftype="sam" file="bowtie_out10.sam" sort="True" />
-    </test>
-    <test>
-      <!--
-      Bowtie command:
-      bowtie-build +offrate 5 +ftabchars 10 +little -f test-data/phiX.fasta phiX_base
-      bowtie -q -X 1000 +ff -p 4 -S +sam-nohead phiX_base -1 test-data/bowtie_in5.fastqsanger -2 test-data/bowtie_in6.fastqsanger > bowtie_out10_u.sam
-      sort bowtie_out10_u.sam > bowtie_out10.sam
-      -p is the number of threads. You need to replace the + with 2 dashes.
-      chrM_base is the index files' location/base name.
-      -->
-      <param name="genomeSource" value="history" />
-      <param name="ownFile" value="phiX.fasta" />
-      <param name="indexSettings" value="indexFull" />
-      <param name="autoB" value="auto" />
-      <param name="nodc" value="dc" />
-      <param name="noref" value="ref" />
-      <param name="offrate" value="5" />
-      <param name="ftab" value="10" />
-      <param name="ntoa" value="no" />
-      <param name="endian" value="little" />
-      <param name="seed" value="-1" />
-      <param name="sPaired" value="paired" />
-      <param name="pInput1" ftype="fastqsanger" value="bowtie_in5.fastqsanger" />
-      <param name="pInput2" ftype="fastqsanger" value="bowtie_in6.fastqsanger" />
-      <param name="pMaxInsert" value="1000" />
-      <param name="pMateOrient" value="ff" />
-      <param name="pSettingsType" value="preSet" />
-      <param name="suppressHeader" value="true" />
+    <test expect_num_outputs="2">
       <param name="save_mapping_stats" value="true" />
-      <output name="output" ftype="sam" file="bowtie_out10.sam" sort="True" />
-      <output name="mapping_stats" ftype="txt" file="bowtie_out11.txt" sort="True" />
+      <param name="refGenomeSource|genomeSource" value="history" />
+      <param name="refGenomeSource|ownFile" value="reference.fasta" />
+      <param name="singlePaired|sPaired" value="single" />
+      <param name="singlePaired|sInput1" value="reads.fastq" ftype="fastqsanger" />
+      <param name="singlePaired|sParams|sSettingsType" value="preSet" />
+      <output name="output" ftype="sam"><assert_contents><has_text text="unique_read" /><has_text text="unique_ref" /></assert_contents></output>
+      <output name="mapping_stats"><assert_contents><has_text text="reads processed: 2" /></assert_contents></output>
+    </test>
+    <test expect_num_outputs="4">
+      <param name="save_mapping_stats" value="true" />
+      <param name="refGenomeSource|genomeSource" value="history" />
+      <param name="refGenomeSource|ownFile" value="reference.fasta" />
+      <param name="singlePaired|sPaired" value="paired" />
+      <param name="singlePaired|pInput1" value="paired_1.fastq" ftype="fastqsanger" />
+      <param name="singlePaired|pInput2" value="paired_2.fastq" ftype="fastqsanger" />
+      <param name="singlePaired|pParams|pSettingsType" value="full" />
+      <param name="singlePaired|pParams|pSuppressAlign" value="1" />
+      <param name="singlePaired|pParams|pMaxFile" value="true" />
+      <param name="singlePaired|pParams|pUnmappedFile" value="false" />
+      <output name="output" ftype="sam"><assert_contents><has_text text="@SQ" /></assert_contents></output>
+      <output name="output_suppressed_reads_l" file="paired_1.fastq" ftype="fastqsanger" />
+      <output name="output_suppressed_reads_r" file="paired_2.fastq" ftype="fastqsanger" />
     </test>
   </tests>
 

@@ -1,4 +1,4 @@
-<tool id="samtools_sort" name="Samtools Sort" version="2.0.5" profile="@PROFILE@">
+<tool id="samtools_sort" name="Samtools Sort" version="2.0.6" profile="@PROFILE@">
     <description>Sort Alignment Files (SAM/BAM)</description>
     <macros>
         <import>macros.xml</import>
@@ -13,7 +13,7 @@
             ###end if
             $prim_key_cond.prim_key_select
             #if $prim_key_cond.prim_key_select == '-t':
-                $prim_key_cond.tag
+                '$prim_key_cond.tag'
                 $prim_key_cond.sec_key_select
             #end if
             $minhash
@@ -33,7 +33,9 @@
             <when value=""/>
             <when value="-n"/>
             <when value="-t">
-                <param name="tag" type="text" optional="false" argument="-t" label="Alignment tag"/>
+                <param name="tag" type="text" optional="false" argument="-t" label="Alignment tag">
+                    <validator type="regex" message="Use a two-character SAM tag">^[A-Za-z][A-Za-z0-9]$</validator>
+                </param>
                 <param name="sec_key_select" type="select" label="Secondary sort key">
                     <option value="">coordinate</option>
                     <option value="-n">name (-n)</option>

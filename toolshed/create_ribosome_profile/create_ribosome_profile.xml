@@ -1,19 +1,22 @@
-<tool id="create_ribosome_profiles" name="Create Ribosome Profiles" version="1.1">
-    <description>Produce a Sorted BED File of A-Site profiles of RPFs.</description>
+<tool id="create_ribosome_profiles" name="Create Ribosome Profiles" version="1.2">
+    <description>Produce sorted bedGraph A-site profiles of ribosome-protected fragments.</description>
     <requirements>
         <requirement type="package" version="1.79">biopython</requirement>
         <requirement type="package" version="0.19.0">pysam</requirement>
     </requirements>
-    <command>python $__tool_directory__/bam_to_ribosome_profile.py ${input1} ${input2} $refGenomeSource.genomeSource
-            #if $refGenomeSource.genomeSource == "builtin":
-                none ${refGenomeSource.input1_builtin.fields.path} ${input4} ${output1}
-            #else:
-                ${refGenomeSource.input1_file} none ${input4} ${output1}
-            #end if
-    </command>
+    <required_files><include path="bam_to_ribosome_profile.py" /></required_files>
+    <command detect_errors="exit_code"><![CDATA[
+python '$__tool_directory__/bam_to_ribosome_profile.py' '$input1' $input2 '$refGenomeSource.genomeSource'
+#if $refGenomeSource.genomeSource == "builtin":
+    none '${refGenomeSource.input1_builtin.fields.path}'
+#else:
+    '$refGenomeSource.input1_file' none
+#end if
+    '$input4' '$output1'
+    ]]></command>
     <inputs>
         <param name="input1" type="data" format="bam" label="BAM file to process"/>
-        <param name="input2" type="integer" value="15" label="Offset to use" help="Use 15 for elongating ribosomes, 12 for initiating and 0 form RNA-seq reads"/>
+        <param name="input2" type="integer" min="0" value="15" label="Offset to use" help="Use 15 for elongating ribosomes, 12 for initiating and 0 form RNA-seq reads"/>
         <conditional name="refGenomeSource">
             <param name="genomeSource" type="select" label="Will you select a reference from your history or use a built-in FASTA?">
                 <option value="builtin">Use a built-in FASTA</option>
@@ -37,22 +40,30 @@
         </param>
     </inputs>
     <outputs>
-       <data name="output1" format="bed"/>
+       <data name="output1" format="bedgraph"/>
     </outputs>
     <tests>
         <test>
-            <param name="input1" value="test.bam.sorted"/>
-            <param name="input2" value="15"/>
-            <param name="input3" value="sacCer3_transcripts.fasta"/>
-            <param name="input4" value="offset"/>
-            <output name="output1" file="test.bam.sorted.bed.sorted " ftype="bed" lines_diff="4" />
+            <param name="input1" value="profile.bam" />
+            <param name="input2" value="15" />
+            <param name="refGenomeSource|genomeSource" value="history" />
+            <param name="refGenomeSource|input1_file" value="profile.fasta" />
+            <param name="input4" value="offset" />
+            <output name="output1" file="profile.offset.bedgraph" ftype="bedgraph" />
+        </test>
+        <test>
+            <param name="input1" value="profile.bam" />
+            <param name="refGenomeSource|genomeSource" value="history" />
+            <param name="refGenomeSource|input1_file" value="profile.fasta" />
+            <param name="input4" value="weight" />
+            <output name="output1" file="profile.weight.bedgraph" ftype="bedgraph" />
         </test>
     </tests>
     <help>
     **What it does**
 
-    Produce a sorted bed file from a sorted BAM file with the option of introducing an offset to the A-Site of a ribosome protected fragment.
+    Produce a sorted bedGraph file from a coordinate-sorted BAM file with the option of introducing an offset to the A-Site of a ribosome protected fragment.
 
     </help>
-    <citations/>
+    <citations><citation type="doi">10.1016/j.jmb.2023.168043</citation></citations>
 </tool>

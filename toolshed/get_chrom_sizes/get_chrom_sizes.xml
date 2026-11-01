@@ -1,14 +1,16 @@
-<tool id="get_chrom_sizes" name="Get Chromosome Sizes" version="2.8">
+<tool id="get_chrom_sizes" name="Get Chromosome Sizes" version="2.9">
     <description>Generates a TAB Delimited chrom.sizes File from an Inputted FASTA</description>
-    <command>
-
-        #if $refGenomeSource.genomeSource == "builtin":
-            cat ${refGenomeSource.input1_builtin.fields.path} | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0; printf ${input2} substr($0,2,100) "\t"; } $0 !~ ">" {c+=length($0);} END {print c; }' | cat > $output1
-        #else:
-            cat ${refGenomeSource.input1_file} | awk '$0 ~ ">" {if (NR > 1) {print c;} c=0; printf ${input2} substr($0,2,100) "\t"; } $0 !~ ">" {c+=length($0);} END {print c; }' | cat > $output1
-        #end if
-
-    </command>
+    <requirements><requirement type="package" version="3.10">python</requirement></requirements>
+    <required_files><include path="calculating_chrom.sizes.py" /></required_files>
+    <command detect_errors="exit_code"><![CDATA[
+python '$__tool_directory__/calculating_chrom.sizes.py'
+#if $refGenomeSource.genomeSource == "builtin":
+    '${refGenomeSource.input1_builtin.fields.path}'
+#else:
+    '$refGenomeSource.input1_file'
+#end if
+    '$input2' '$output1'
+    ]]></command>
     <inputs>
         <conditional name="refGenomeSource">
             <param name="genomeSource" type="select" label="Will you select a reference from your history or use a built-in FASTA?">
@@ -36,17 +38,18 @@
     </outputs>
     <tests>
         <test>
-            <param name="input1" value="test.fasta" ftype="fasta" />
-            <param name="input2" value="chr"/>
-            <output name="output1" file="test.fasta.sizes" ftype="tabular" lines_diff="4" />
+            <param name="refGenomeSource|genomeSource" value="history" />
+            <param name="refGenomeSource|input1_file" value="small.fasta" />
+            <param name="input2" value="chr" />
+            <output name="output1" file="small.sizes" />
         </test>
     </tests>
     <help>
 **What it does**
 
-Creates a chromosome sizes file from a fasta file. This is needed for creating ribosome profiles. 
+Creates a chromosome sizes file from a fasta file. This is needed for creating ribosome profiles.
 
 Some commonly used genomes are provided to save on storage.
     </help>
-    <citations/>
+    <citations><citation type="doi">10.1016/j.jmb.2023.168043</citation></citations>
 </tool>

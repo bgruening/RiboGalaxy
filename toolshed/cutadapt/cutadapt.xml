@@ -18,19 +18,19 @@
 #set library_type = str($library.type)
 #if $library_type == 'paired':
     #set paired = True
-    #set read1 = re.sub('[^\w\-\s]', '_', str($library.input_1.element_identifier))
-    #set read2 = re.sub('[^\w\-\s]', '_', str($library.input_2.element_identifier))
+    #set read1 = "input_1"
+    #set read2 = "input_2"
     #set input_1 = $library.input_1
     #set input_2 = $library.input_2
 #else if $library_type == 'paired_collection'
     #set paired = True
     #set input_1 = $library.input_1.forward
     #set input_2 = $library.input_1.reverse
-    #set read1 = re.sub('[^\w\-\s]', '_', str($library.input_1.name)) + "_1"
-    #set read2 = re.sub('[^\w\-\s]', '_', str($library.input_1.name)) + "_2"
+    #set read1 = "input_1"
+    #set read2 = "input_2"
 #else
     #set input_1 = $library.input_1
-    #set read1 = re.sub('[^\w\-\s]', '_', str($library.input_1.element_identifier))
+    #set read1 = "input_1"
 #end if
 
 #if $input_1.is_of_type("fastq.gz", "fastqsanger.gz"):
@@ -55,7 +55,7 @@ ln -f -s '${input_1}' '$read1' &&
     #if $input_2.is_of_type("fastq.gz", "fastqsanger.gz"):
         #set ext2 = ".fq.gz"
     #else if $input_2.is_of_type("fastq.bz2", "fastqsanger.bz2"):
-        #set ext2 = ".fq.gz"
+        #set ext2 = ".fq.bz2"
     #else if $input_2.is_of_type('fasta'):
         #set ext2 = ".fa"
     #else:
@@ -139,7 +139,7 @@ $filter_options.discard_cassava
 #end if
 $read_mod_options.trim_n
 #if $read_mod_options.strip_suffix != ''
-    --strip-suffix $read_mod_options.strip_suffix
+    --strip-suffix '$read_mod_options.strip_suffix'
 #end if
 #if str($read_mod_options.shorten_options.shorten_values) == 'True':
     #if str($read_mod_options.shorten_options.shorten_end) == '3prime'
@@ -330,7 +330,7 @@ $read_mod_options.zero_cap
             <expand macro="inherit_format_2" />
         </data>
 
-        <collection name="out_pairs" type="paired" format_source="input_1" label="${tool.name} on ${on_string}: Reads">
+        <collection name="out_pairs" type="paired" format_source="library|input_1" label="${tool.name} on ${on_string}: Reads">
             <filter>library['type'] == 'paired_collection' and 'multiple_output' not in output_selector</filter>
             <data name="forward" from_work_dir="out1.fq*" />
             <data name="reverse" from_work_dir="out2.fq*" />
@@ -392,8 +392,8 @@ $read_mod_options.zero_cap
     <tests>
         <!-- Ensure fastq works -->
         <test expect_num_outputs="1">
-            <param name="type" value="single" />
-            <param name="input_1" ftype="fastq" value="cutadapt_small.fastq" />
+            <conditional name="library"><param name="type" value="single"/>
+            <param name="input_1" ftype="fastq" value="cutadapt_small.fastq"/>
             <section name="r1">
                 <repeat name="adapters">
                     <conditional name="adapter_source">
@@ -402,12 +402,12 @@ $read_mod_options.zero_cap
                     </conditional>
                 </repeat>
             </section>
-            <output name="out1" file="cutadapt_small.out" ftype="fastq"/>
+            </conditional><output name="out1" file="cutadapt_small.out" ftype="fastq"/>
         </test>
         <!-- Ensure single end fastq.gz works -->
         <test expect_num_outputs="1">
-            <param name="type" value="single" />
-            <param name="input_1" ftype="fastq.gz" value="bwa-mem-fastq1.fq.gz" />
+            <conditional name="library"><param name="type" value="single"/>
+            <param name="input_1" ftype="fastq.gz" value="bwa-mem-fastq1.fq.gz"/>
             <section name="r1">
                 <repeat name="adapters">
                     <conditional name="adapter_source">
@@ -416,9 +416,10 @@ $read_mod_options.zero_cap
                     </conditional>
                 </repeat>
             </section>
-            <output name="out1" decompress="True" file="cutadapt_out1.fq.gz" ftype="fastq.gz"/>
+            </conditional><output name="out1" decompress="True" file="cutadapt_out1.fq.gz" ftype="fastq.gz"/>
         </test>
     </tests>
+
 
     <help><![CDATA[
 

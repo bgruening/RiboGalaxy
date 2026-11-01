@@ -67,6 +67,7 @@ usage: bowtie_wrapper.py [options]
 import optparse
 import os
 import shutil
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -148,7 +149,7 @@ def __main__():
     stdout = ''
 
     # make temp directory for placement of indices and copy reference file there if necessary
-    tmp_index_dir = tempfile.mkdtemp()
+    tmp_index_dir = tempfile.mkdtemp(dir=os.getcwd())
     # get type of data (solid or solexa)
     if options.dataType == 'solid':
         colorspace = '-C'
@@ -218,11 +219,11 @@ def __main__():
         ref_file_name = ref_file.name
         ref_file.close()
         os.symlink( options.ref, ref_file_name )
-        cmd1 = 'bowtie-build %s -f %s %s' % ( indexing_cmds, ref_file_name, ref_file_name )
+        cmd1 = ['bowtie-build'] + shlex.split(indexing_cmds) + ['-f', ref_file_name, ref_file_name]
         try:
             tmp = tempfile.NamedTemporaryFile( dir=tmp_index_dir ).name
             with open(tmp, 'w') as tmp_stderr:
-                returncode = subprocess.call(args=cmd1, shell=True, cwd=tmp_index_dir, stderr=tmp_stderr.fileno())
+                returncode = subprocess.call(args=cmd1, cwd=tmp_index_dir, stderr=tmp_stderr.fileno())
             if returncode != 0:
                 # get stderr, allowing for case where it's very large
                 stderr = ''
@@ -357,30 +358,6 @@ def __main__():
                 seed = '--seed %s' % options.seed
             else:
                 seed = ''
-            if options.paired == 'paired':
-                if options.output_unmapped_reads_l and options.output_unmapped_reads_r:
-                    tmp_unmapped_file = tempfile.NamedTemporaryFile( dir=tmp_index_dir, suffix='.fastq' )
-                    tmp_unmapped_file_name = tmp_unmapped_file.name
-                    tmp_unmapped_file.close()
-                    output_unmapped_reads = '--un %s' % tmp_unmapped_file_name
-                else:
-                    output_unmapped_reads = ''
-                if options.output_suppressed_reads:
-                    tmp_suppressed_file = tempfile.NamedTemporaryFile( dir=tmp_index_dir, suffix='.fastq' )
-                    tmp_suppressed_file_name = tmp_suppressed_file.name
-                    tmp_suppressed_file.close()
-                    output_suppressed_reads = '--max %s' % tmp_suppressed_file_name
-                else:
-                    output_suppressed_reads = ''
-            else:
-                if options.output_unmapped_reads:
-                    output_unmapped_reads = '--un %s' % options.output_unmapped_reads
-                else:
-                    output_unmapped_reads = ''
-                if options.output_suppressed_reads:
-                    output_suppressed_reads = '--max %s' % options.output_suppressed_reads
-                else:
-                    output_suppressed_reads = ''
             snpfrac = ''
             if options.snpphred and int( options.snpphred ) >= 0:
                 snpphred = '--snpphred %s' % options.snpphred
@@ -400,29 +377,53 @@ def __main__():
                               maxAlignAttempt, forwardAlign, reverseAlign, maxBacktracks,
                               tryHard, valAlign, allValAligns, suppressAlign, best,
                               strata, offrate, seed, snpphred, snpfrac, keepends,
-                              output_unmapped_reads, output_suppressed_reads,
+                              '', '',
                               quality_score_encoding )
         except ValueError as e:
             # clean up temp dir
             if os.path.exists( tmp_index_dir ):
                 shutil.rmtree( tmp_index_dir )
             stop_err( 'Something is wrong with the alignment parameters and the alignment could not be run\n' + str( e ) )
+    if options.paired == 'paired':
+        if options.output_unmapped_reads_l and options.output_unmapped_reads_r:
+            tmp_unmapped_file = tempfile.NamedTemporaryFile( dir=tmp_index_dir, suffix='.fastq' )
+            tmp_unmapped_file_name = tmp_unmapped_file.name
+            tmp_unmapped_file.close()
+            output_unmapped_reads = '--un %s' % shlex.quote(tmp_unmapped_file_name)
+        else:
+            output_unmapped_reads = ''
+        if options.output_suppressed_reads_l and options.output_suppressed_reads_r:
+            tmp_suppressed_file = tempfile.NamedTemporaryFile( dir=tmp_index_dir, suffix='.fastq' )
+            tmp_suppressed_file_name = tmp_suppressed_file.name
+            tmp_suppressed_file.close()
+            output_suppressed_reads = '--max %s' % shlex.quote(tmp_suppressed_file_name)
+        else:
+            output_suppressed_reads = ''
+    else:
+        if options.output_unmapped_reads:
+            output_unmapped_reads = '--un %s' % shlex.quote(options.output_unmapped_reads)
+        else:
+            output_unmapped_reads = ''
+        if options.output_suppressed_reads:
+            output_suppressed_reads = '--max %s' % shlex.quote(options.output_suppressed_reads)
+        else:
+            output_suppressed_reads = ''
     try:
         # have to nest try-except in try-finally to handle 2.4
         try:
-            # prepare actual mapping commands
+            # Paths are individual arguments, never shell program text.
+            cmd2 = ['bowtie'] + shlex.split(aligning_cmds)
+            cmd2 += shlex.split(output_unmapped_reads) + shlex.split(output_suppressed_reads)
+            cmd2.append(ref_file_name)
             if options.paired == 'paired':
-                # cmd2 = 'bowtie %s %s -1 %s -2 %s > %s | samtools view -b -S > %s' % ( aligning_cmds, ref_file_name, options.input1, options.input2, options.output, options.output )
-                cmd2 = 'bowtie %s %s -1 %s -2 %s > %s ' % ( aligning_cmds, ref_file_name, options.input1, options.input2, options.output )
-
+                cmd2 += ['-1', options.input1, '-2', options.input2]
             else:
-                # cmd2 = 'bowtie %s %s %s > %s | samtools view -b -S > %s' % ( aligning_cmds, ref_file_name, options.input1, options.output, options.output )
-                cmd2 = 'bowtie %s %s %s > %s ' % ( aligning_cmds, ref_file_name, options.input1, options.output )
-
-            # align
-            tmp = tempfile.NamedTemporaryFile( dir=tmp_index_dir ).name
-            with open(tmp, 'w') as tmp_stderr:
-                returncode = subprocess.call(args=cmd2, shell=True, cwd=tmp_index_dir, stderr=tmp_stderr.fileno())
+                cmd2.append(options.input1)
+            tmp = tempfile.NamedTemporaryFile(dir=tmp_index_dir).name
+            output_path = os.devnull if options.output == 'XXXX' else options.output
+            with open(tmp, 'w') as tmp_stderr, open(output_path, 'w') as output:
+                returncode = subprocess.call(cmd2, cwd=tmp_index_dir,
+                                             stderr=tmp_stderr, stdout=output)
             # get stderr, allowing for case where it's very large
             stderr = ''
             buffsize = 1048576
@@ -445,11 +446,11 @@ def __main__():
                     options.output_suppressed_reads_l and options.output_suppressed_reads_r:
                 try:
                     left = tmp_suppressed_file_name.replace( '.fastq', '_1.fastq' )
-                    right = tmp_suppressed_file_name.replace( '.fastq', '_1.fastq' )
+                    right = tmp_suppressed_file_name.replace( '.fastq', '_2.fastq' )
                     shutil.move( left, options.output_suppressed_reads_l )
                     shutil.move( right, options.output_suppressed_reads_r )
                 except Exception as e:
-                    sys.stdout.write( 'Error producing the suppressed output file.\n' )
+                    raise RuntimeError('Error producing the suppressed output files') from e
             if options.paired == 'paired' and tmp_unmapped_file_name and \
                     options.output_unmapped_reads_l and options.output_unmapped_reads_r:
                 try:
@@ -458,10 +459,7 @@ def __main__():
                     shutil.move( left, options.output_unmapped_reads_l )
                     shutil.move( right, options.output_unmapped_reads_r )
                 except Exception as e:
-                    sys.stdout.write( 'Error producing the unmapped output file.\n' )
-            # check that there are results in the output file
-            if os.path.getsize( options.output ) == 0:
-                raise Exception('The output file is empty, there may be an error with your input file or settings.')
+                    raise RuntimeError('Error producing the unmapped output files') from e
         except Exception as e:
             stop_err( 'Error aligning sequence. ' + str( e ) )
     finally:

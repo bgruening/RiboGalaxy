@@ -27,11 +27,18 @@ def process_fastq_record(record, output, UMI_5_prime_length=2, UMI_3_prime_lengt
     qual = lines[3]
 
     if (header.startswith('@')):
-        trimmed_seq = seq[UMI_5_prime_length:-(UMI_3_prime_length + 1)] # fooprint + barcode
-        UMI = seq[0:UMI_5_prime_length]+seq.rstrip()[-UMI_3_prime_length:len(seq)] #7nt in total; 5'NN and last 3'NNNNN
-        split_header = header.split(" ")
-        new_header = split_header[0]+"_"+UMI+" "+split_header[1]
-        new_qual = qual[UMI_5_prime_length:-(UMI_3_prime_length + 1)]
+        if min(UMI_5_prime_length, UMI_3_prime_length) < 0:
+            raise ValueError("UMI lengths must be non-negative")
+        if UMI_5_prime_length + UMI_3_prime_length > len(seq):
+            raise ValueError("UMI lengths exceed read length for " + record.id)
+        end = len(seq) - UMI_3_prime_length
+        trimmed_seq = seq[UMI_5_prime_length:end]
+        UMI = seq[:UMI_5_prime_length] + seq[end:]
+        split_header = header.split(maxsplit=1)
+        new_header = split_header[0] + "_" + UMI
+        if len(split_header) == 2:
+            new_header += " " + split_header[1]
+        new_qual = qual[UMI_5_prime_length:end]
         output.write(new_header+'\n')
         output.write(trimmed_seq+'\n')
         output.write(sep+'\n')

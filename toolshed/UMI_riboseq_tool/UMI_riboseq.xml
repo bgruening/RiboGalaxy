@@ -1,28 +1,39 @@
-<tool id="UMI_riboseq" name="UMIs to Header" version="0.1.8">
+<tool id="UMI_riboseq" name="UMIs to Header" version="0.1.9">
 <requirements>
-    <requirement type="package" version="1.75">biopython</requirement>
+    <requirement type="package" version="1.79">biopython</requirement>
 </requirements>
-<command detect_errors="exit_code">
-<![CDATA[ python3 $__tool_directory__/UMI.py $reads $output $gzip ${five_prime_UMI_length} ${three_prime_UMI_length}]]>
-</command>
+    <required_files><include path="UMI.py" /></required_files>
+<command detect_errors="exit_code"><![CDATA[
+python '$__tool_directory__/UMI.py' '$reads' '$output' '$gzip' $five_prime_UMI_length $three_prime_UMI_length
+    ]]></command>
 <inputs>
     <param format="fastq,fastqsanger,fastqsanger.gz" name="reads" type="data" label="fastqsanger,fastqsanger.gz"/>
     <param name="gzip" type="boolean" truevalue="true" falsevalue="false" checked="True" label="Gzip the outputted FASTQ" />
-    <param name="five_prime_UMI_length" type="integer" value='2' label="Number of UMI bases at the 5' end" help="2 for McGlincy Ingolia Protocol" />
-    <param name="three_prime_UMI_length" type="integer" value='5' label="Number of UMI bases at the 3' end)" help="5 for McGlincy Ingolia Protocol" />
+    <param name="five_prime_UMI_length" type="integer" min="0" value='2' label="Number of UMI bases at the 5' end" help="2 for McGlincy Ingolia Protocol" />
+    <param name="three_prime_UMI_length" type="integer" min="0" value='5' label="Number of UMI bases at the 3' end" help="5 for McGlincy Ingolia Protocol" />
 
 </inputs>
 <outputs>
-    <data format="fastqsanger.gz" name="output"/>
+    <data format="fastqsanger.gz" name="output">
+        <change_format><when input="gzip" value="false" format="fastqsanger" /></change_format>
+    </data>
 </outputs>
 <tests>
     <test>
-        <param name="reads" value="sub_10k_reads.fq.gz"/>
-        <output name="output" file="output"/>
+        <param name="reads" value="umi.fastq" />
+        <param name="gzip" value="false" />
+        <output name="output" file="umi.expected.fastq" ftype="fastqsanger" />
     </test>
     <test>
-        <param name="reads" value="sub_10k_reads2.fq"/>
-        <output name="output" file="output2"/>
+        <param name="reads" value="umi.fastq.gz" />
+        <param name="gzip" value="true" />
+        <output name="output" file="umi.expected.fastq" decompress="true" ftype="fastqsanger.gz" />
+    </test>
+    <test>
+        <param name="reads" value="umi.fastq" />
+        <param name="gzip" value="false" />
+        <param name="three_prime_UMI_length" value="0" />
+        <output name="output" file="umi.zero.expected.fastq" ftype="fastqsanger" />
     </test>
 </tests>
 <help>

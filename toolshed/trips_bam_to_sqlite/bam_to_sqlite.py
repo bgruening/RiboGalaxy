@@ -3,6 +3,8 @@ import pysam
 import operator
 import os
 import time
+import tempfile
+from pathlib import Path
 import sqlite3
 from sqlitedict import SqliteDict
 
@@ -13,26 +15,16 @@ def tran_to_genome(tran, pos, transcriptome_info_dict):
 	strand = traninfo["strand"]
 	exons = sorted(traninfo["exons"])
 	#print exons
-	if strand == "+":
-		exon_start = 0
-		for tup in exons:
-			exon_start = tup[0]
-			exonlen = tup[1] - tup[0]
-			if pos > exonlen:
-				pos = (pos - exonlen)-1
-			else:
-				break
-		genomic_pos = (exon_start+pos)-1
-	elif strand == "-":
-		exon_start = 0
-		for tup in exons[::-1]:
-			exon_start = tup[1]
-			exonlen = tup[1] - tup[0]
-			if pos > exonlen:
-				pos = (pos - exonlen)-1
-			else:
-				break
-		genomic_pos = (exon_start-pos)+1
+	# Annotation exons are 1-based inclusive; BAM positions are 0-based.
+	ordered_exons = exons if strand == "+" else exons[::-1]
+	for start, end in ordered_exons:
+		length = end - start + 1
+		if pos < length:
+			genomic_pos = start - 1 + pos if strand == "+" else end - 1 - pos
+			break
+		pos -= length
+	else:
+		raise ValueError("Transcript position exceeds annotated exons for " + tran)
 	return (chrom, genomic_pos)
 
 
@@ -150,13 +142,13 @@ def processor(process_chunk, master_read_dict, transcriptome_info_dict,master_di
 					# apply the modifiers
 					#pos = pos+pos_modifier
 					#readlen = readlen - readlen_modifier
-				if readlen in master_read_dict[tran]["ambig"]:
-					if pos in master_read_dict[tran]["ambig"][readlen]:
-						master_read_dict[tran]["ambig"][readlen][pos] += 1
-					else:
-						master_read_dict[tran]["ambig"][readlen][pos] = 1
+			if readlen in master_read_dict[tran]["ambig"]:
+				if pos in master_read_dict[tran]["ambig"][readlen]:
+					master_read_dict[tran]["ambig"][readlen][pos] += 1
 				else:
-					master_read_dict[tran]["ambig"][readlen] = {pos:1}
+					master_read_dict[tran]["ambig"][readlen][pos] = 1
+			else:
+				master_read_dict[tran]["ambig"][readlen] = {pos:1}
 	return ambiguously_mapped_reads
 
 
@@ -207,8 +199,7 @@ def get_mismatch_pos(md_tag,pos,readlen,master_read_dict,tran,readseq):
 
 
 
-def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
-	desc = "NULL"
+def process_bam(bam_filepath, transcriptome_info_dict_path, outputfile, desc="NULL"):
 	start_time = time.time()
 	study_dict ={}
 	nuc_count_dict = {"mapped":{},"unmapped":{}}
@@ -220,7 +211,7 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 	master_dict = {"unambiguous_non_coding_count":0,"unambiguous_coding_count":0,"current_dir":os.getcwd()}
 
 	transcriptome_info_dict = {}
-	connection = sqlite3.connect(transcriptome_info_dict_path)
+	connection = sqlite3.connect(Path(transcriptome_info_dict_path).resolve().as_uri() + "?mode=ro", uri=True)
 	cursor = connection.cursor()
 	cursor.execute("SELECT transcript,cds_start,cds_stop,length,strand,chrom,tran_type from transcripts;")
 	result = cursor.fetchall()
@@ -233,6 +224,8 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 	for row in result:
 		transcriptome_info_dict[str(row[0])]["exons"].append((row[1],row[2]))
 
+	connection.close()
+
 	#it might be the case that there are no multimappers, so set this to 0 first to avoid an error, it will be overwritten later if there is multimappers
 	multimappers = 0
 	unmapped_reads = 0
@@ -243,7 +236,7 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 	final_offsets = {"fiveprime":{"offsets":{}, "read_scores":{}}, "threeprime":{"offsets":{}, "read_scores":{}}}
 	master_read_dict = {}
 	prev_seq = ""
-	process_chunk = {"read_name":[["placeholder_tran","1","28"]]}
+	process_chunk = {}
 	mapped_reads = 0
 	ambiguously_mapped_reads = 0
 	master_trip_dict = {"fiveprime":{}, "threeprime":{}}
@@ -251,11 +244,12 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 	master_metagene_stop_dict = {"fiveprime":{}, "threeprime":{}}
 
 
-	os.system(f'samtools sort -n {bam_filepath} -o {bam_filepath}_n_sorted.bam 2> /dev/null')
-
-	pysam.set_verbosity(0)
-	infile = pysam.Samfile(f"{bam_filepath}_n_sorted.bam", "rb")
-	header = infile.header["HD"]
+	# Sort in the job directory and propagate samtools failures.
+	workdir = tempfile.TemporaryDirectory(dir=".")
+	sorted_bam = os.path.join(workdir.name, "name_sorted.bam")
+	pysam.sort("-n", "-o", sorted_bam, bam_filepath)
+	infile = pysam.AlignmentFile(sorted_bam, "rb")
+	header = infile.header.get("HD", {})
 
 	unsorted = False
 	if "SO" in header:
@@ -268,9 +262,47 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 	if unsorted == True:
 		print ("ERROR: Bam file appears to be unsorted or not sorted by read name. To sort by read name use the command: samtools sort -n input.bam output.bam")
 		print (header,bam_filepath)
-		sys.exit()
+		raise ValueError("BAM must be sorted by read name")
 	total_bam_lines = 0
 	all_ref_ids = infile.references
+
+	def flush_chunk():
+		nonlocal ambiguously_mapped_reads
+		seq = prev_seq
+		readlen = len(seq)
+
+		# Note if a read maps ambiguously it will still be counted toward the read length distribution (however it will only be counted once, not each time it maps)
+		if readlen not in read_length_dict:
+			read_length_dict[readlen] = 0
+		read_length_dict[readlen] += 1
+
+		if readlen not in nuc_count_dict["mapped"]:
+			nuc_count_dict["mapped"][readlen] = {}
+		if readlen not in threeprime_nuc_count_dict["mapped"]:
+			threeprime_nuc_count_dict["mapped"][readlen] = {}
+		if readlen not in dinuc_count_dict:
+			dinuc_count_dict[readlen] = {"AA":0, "TA":0, "GA":0, "CA":0,
+						"AT":0, "TT":0, "GT":0, "CT":0,
+						"AG":0, "TG":0, "GG":0, "CG":0,
+						"AC":0, "TC":0, "GC":0, "CC":0}
+
+		for i in range(0,len(seq)):
+			if i not in nuc_count_dict["mapped"][readlen]:
+				nuc_count_dict["mapped"][readlen][i] = {"A":0, "T":0, "G":0, "C":0, "N":0}
+			nuc_count_dict["mapped"][readlen][i][seq[i]] += 1
+
+		for i in range(0,len(seq)):
+			try:
+				dinuc_count_dict[readlen][seq[i:i+2]] += 1
+			except:
+				pass
+
+		for i in range(len(seq),0,-1):
+			dist = i-len(seq)
+			if dist not in threeprime_nuc_count_dict["mapped"][readlen]:
+				threeprime_nuc_count_dict["mapped"][readlen][dist] = {"A":0, "T":0, "G":0, "C":0, "N":0}
+			threeprime_nuc_count_dict["mapped"][readlen][dist][seq[dist]] += 1
+		ambiguously_mapped_reads += processor(process_chunk, master_read_dict, transcriptome_info_dict,master_dict,prev_seq, unambig_read_length_dict)
 
 	for read in infile.fetch(until_eof=True):
 		total_bam_lines += 1
@@ -283,50 +315,12 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 			pos = read.reference_start
 			readname = read.query_name
 			read_tags = read.tags
-			if readname == list(process_chunk)[0]:
-				process_chunk[readname].append([tran,pos,read_tags])
-			#if the current read is different from previous reads send 'process_chunk' to the 'processor' function, then start 'process_chunk' over using current read
+			if process_chunk and readname == next(iter(process_chunk)):
+				process_chunk[readname].append([tran, pos, read_tags])
 			else:
-				if list(process_chunk)[0] != "read_name":
-
-					#At this point we work out readseq, we do this for multiple reasons, firstly so we don't count the sequence from a read multiple times, just because
-					# it aligns multiple times and secondly we only call read.seq once (read.seq is computationally expensive)
-					seq = read.seq
-					readlen = len(seq)
-
-					# Note if a read maps ambiguously it will still be counted toward the read length distribution (however it will only be counted once, not each time it maps)
-					if readlen not in read_length_dict:
-						read_length_dict[readlen] = 0
-					read_length_dict[readlen] += 1
-
-					if readlen not in nuc_count_dict["mapped"]:
-						nuc_count_dict["mapped"][readlen] = {}
-					if readlen not in threeprime_nuc_count_dict["mapped"]:
-						threeprime_nuc_count_dict["mapped"][readlen] = {}
-					if readlen not in dinuc_count_dict:
-						dinuc_count_dict[readlen] = {"AA":0, "TA":0, "GA":0, "CA":0,
-									"AT":0, "TT":0, "GT":0, "CT":0,
-									"AG":0, "TG":0, "GG":0, "CG":0,
-									"AC":0, "TC":0, "GC":0, "CC":0}
-
-					for i in range(0,len(seq)):
-						if i not in nuc_count_dict["mapped"][readlen]:
-							nuc_count_dict["mapped"][readlen][i] = {"A":0, "T":0, "G":0, "C":0, "N":0}
-						nuc_count_dict["mapped"][readlen][i][seq[i]] += 1
-
-					for i in range(0,len(seq)):
-						try:
-							dinuc_count_dict[readlen][seq[i:i+2]] += 1
-						except:
-							pass
-
-					for i in range(len(seq),0,-1):
-						dist = i-len(seq)
-						if dist not in threeprime_nuc_count_dict["mapped"][readlen]:
-							threeprime_nuc_count_dict["mapped"][readlen][dist] = {"A":0, "T":0, "G":0, "C":0, "N":0}
-						threeprime_nuc_count_dict["mapped"][readlen][dist][seq[dist]] += 1
-					ambiguously_mapped_reads += processor(process_chunk, master_read_dict, transcriptome_info_dict,master_dict,prev_seq, unambig_read_length_dict)
-				process_chunk = {readname:[[tran, pos, read_tags]]}
+				if process_chunk:
+					flush_chunk()
+				process_chunk = {readname: [[tran, pos, read_tags]]}
 				prev_seq = read.seq
 		else:
 			unmapped_reads += 1
@@ -356,14 +350,17 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 					threeprime_nuc_count_dict["unmapped"][readlen][dist] = {"A":0, "T":0, "G":0, "C":0, "N":0}
 				threeprime_nuc_count_dict["unmapped"][readlen][dist][seq[dist]] += 1
 
+	if process_chunk:
+		flush_chunk()
+	infile.close()
+	workdir.cleanup()
+
 	#add stats about mapped/unmapped reads to file dict which will be used for the final report
 	master_dict["total_bam_lines"] = total_bam_lines
 	master_dict["mapped_reads"] = mapped_reads
 	master_dict["unmapped_reads"] = unmapped_reads
 	master_dict["ambiguously_mapped_reads"] = ambiguously_mapped_reads
 	
-	if "read_name" in master_read_dict:
-		del master_read_dict["read_name"]
 	print ("BAM file processed")
 	print ("Creating metagenes, triplet periodicity plots, etc.")
 
@@ -575,11 +572,10 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 
 
 if __name__ == "__main__":
-	if len(sys.argv) <= 2:
-		print ("Usage: python bam_to_sqlite.py <path_to_bam_file> <path_to_organism.sqlite> <file_description (optional)>")
-		sys.exit()
+	if len(sys.argv) != 5:
+		sys.exit("Usage: python bam_to_sqlite.py <bam> <annotation.sqlite> <description> <output.sqlite>")
 	bam_filepath = sys.argv[1]
 	annotation_sqlite_filepath = sys.argv[2]
 	desc = sys.argv[3]
 	outputfile = sys.argv[4]
-	process_bam(bam_filepath,annotation_sqlite_filepath,outputfile)
+	process_bam(bam_filepath, annotation_sqlite_filepath, outputfile, desc)

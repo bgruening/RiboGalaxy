@@ -29,7 +29,7 @@ output = sys.argv[7]
 
 if os.path.isfile("{}.sqlite".format(organism)):
     print("{}.sqlite already exists".format(organism))
-    sys.exit()
+    sys.exit(1)
 
 
 # old_exons = SqliteDict(
@@ -115,14 +115,14 @@ if delimiters["transcripts"]["before"] == []:
             user_transcript_id
         )
     )
-    sys.exit()
+    sys.exit(1)
 if delimiters["genes"]["before"] == []:
     print(
         "ERROR: No gene with the name {} could be found in the annotation file".format(
             user_gene_name
         )
     )
-    sys.exit()
+    sys.exit(1)
 
 master_dict = {}
 coding_dict = {}
@@ -166,7 +166,6 @@ for entry in split_fasta[1:]:
         tran += "_chrY"
     elif "_PAR_X" in tran:
         tran += "_chrX"
-    tran = tran.upper()
     starts_stops = get_start_stops(seq)
     print("tran", tran)
     if tran not in master_dict:
@@ -216,7 +215,7 @@ def parse_gtf_file(annotation_file):
                     splitline,
                     line,
                 )
-                sys.exit()
+                sys.exit(1)
             # if annot_type not in ["cds", "utr", "exon", "transcript","five_prime_utr", "three_prime_utr","stop_codon","start_codon"]:
             # 	continue
             if (
@@ -231,8 +230,8 @@ def parse_gtf_file(annotation_file):
                 start = int(splitline[3])
                 end = int(splitline[4])
             else:
-                start = int(splitline[3]) + 1
-                end = int(splitline[4]) + 1
+                start = int(splitline[3])
+                end = int(splitline[4])
             desc = splitline[8]
             tran = desc
             gene = desc
@@ -252,7 +251,6 @@ def parse_gtf_file(annotation_file):
             tran = tran.replace("-", "_").replace(".", "_")
             tran = tran.replace("(", "").replace(")", "")
             tran = tran.replace(" ", "").replace("\t", "")
-            tran = tran.upper()
             tran = tran.replace("GENE_", "").replace("ID_", "")
             if "_PAR_Y" in desc:
                 # print ("adding _PAR_Y to tran")
@@ -276,7 +274,6 @@ def parse_gtf_file(annotation_file):
                 for item in delimiters["genes"]["after"]:
                     if item in gene:
                         gene = gene.split(item)[0]
-                gene = gene.replace("'", "''")
                 gene = gene.replace("GENE_", "")
                 gene = gene.replace("ID_", "")
                 gene = gene.upper()
@@ -405,7 +402,7 @@ for tran in master_dict:
             # 	#sys.exit()
         else:
             print("strand is unknown: {}".format(strand))
-            sys.exit()
+            sys.exit(1)
     # get exon junctions, cds is easy just get end of each tuple except last, same for utr except for if same as cds start/stop
     total_intronic = 0
     try:
@@ -747,15 +744,8 @@ for transcript in master_dict:
                     cds_cov = cds_cov_count / length
                     # print ("orftype, start, stop", orftype, orf_start, orf_stop)
                     cursor.execute(
-                        "INSERT INTO {} VALUES('{}','{}',{},{},{},{});".format(
-                            orftype,
-                            transcript,
-                            start_codon,
-                            length,
-                            orf_start,
-                            orf_stop,
-                            cds_cov,
-                        )
+                        "INSERT INTO {} VALUES (?, ?, ?, ?, ?, ?)".format(orftype),
+                            (transcript, start_codon, length, orf_start, orf_stop, cds_cov)
                     )
                     break
         # sys.exit()
@@ -842,15 +832,8 @@ for transcript in master_dict:
                             # 			orf_dict[orftype][transcript] = []
                             # 	#print ("some weird stop or something")
                         cursor.execute(
-                            "INSERT INTO {} VALUES('{}','{}',{},{},{},{});".format(
-                                orftype,
-                                transcript,
-                                start_codon,
-                                length,
-                                orf_start,
-                                orf_stop,
-                                cds_cov,
-                            )
+                            "INSERT INTO {} VALUES (?, ?, ?, ?, ?, ?)".format(orftype),
+                            (transcript, start_codon, length, orf_start, orf_stop, cds_cov)
                         )
                         break
 # Used to keep track of the codons at cds_start and cds_stop positions,
@@ -893,8 +876,8 @@ for transcript in master_dict:
     cds_gc = "NULL"
     three_gc = "NULL"
     if cds_start != "NULL":
-        five_gc = calcgc(seq[:cds_start])
-        cds_gc = calcgc(seq[cds_start:cds_stop])
+        five_gc = calcgc(seq[:cds_start - 1])
+        cds_gc = calcgc(seq[cds_start - 1:cds_stop])
         three_gc = calcgc(seq[cds_stop:])
         # check that the nucleotide cds_start points to is the first of the start codon
         # take one becase cds_start is 1 based but python indexing is 0 based
@@ -934,41 +917,24 @@ for transcript in master_dict:
     # print (principal)
     # print (version)
     # print ("INSERT INTO transcripts VALUES('{}','{}',{},{},{},'{}','{}','{}','{}','{}',{},{},{},{});".format(transcript, gene, length, cds_start, cds_stop, seq, strand,stop_list, start_list, exon_junctions, tran_type,gene_type,principal,version))
-    cursor.execute(
-        "INSERT INTO transcripts VALUES('{}','{}',{},{},{},'{}','{}','{}','{}','{}',{},{},{},{},{},{},{},{},'{}');".format(
-            transcript,
-            gene,
-            length,
-            cds_start,
-            cds_stop,
-            seq,
-            strand,
-            stop_list,
-            start_list,
-            exon_junctions,
-            tran_type,
-            gene_type,
-            principal,
-            version,
-            gc,
-            five_gc,
-            cds_gc,
-            three_gc,
-            chrom,
-        )
+    # Legacy parsing uses the string NULL internally; bind genuine SQL NULLs.
+    cds_start, cds_stop, version, gc, five_gc, cds_gc, three_gc = (
+        None if value == "NULL" else value
+        for value in (cds_start, cds_stop, version, gc, five_gc, cds_gc, three_gc)
     )
-
-    for tup in master_dict[transcript]["exon"]:
-        cursor.execute(
-            "INSERT INTO exons VALUES('{}',{},{});".format(transcript, tup[0], tup[1])
-        )
+    cursor.execute(
+        "INSERT INTO transcripts VALUES (" + ",".join(["?"] * 19) + ")",
+        (transcript, gene, length, cds_start, cds_stop, seq, strand, stop_list,
+         start_list, exon_junctions, tran_type, gene_type, principal, version,
+         gc, five_gc, cds_gc, three_gc, chrom),
+    )
+    for start, end in master_dict[transcript]["exon"]:
+        cursor.execute("INSERT INTO exons VALUES (?, ?, ?)", (transcript, start, end))
     if transcript in coding_dict:
-        for tup in coding_dict[transcript]:
-            cursor.execute(
-                "INSERT INTO coding_regions VALUES('{}',{},{});".format(
-                    transcript, tup[0], tup[1]
-                )
-            )
+        for start, end in coding_dict[transcript]:
+            cursor.execute("INSERT INTO coding_regions VALUES (?, ?, ?)",
+                           (transcript, start, end))
+
 # print(cursor.execute(
 #     ".tables"
 #     ))

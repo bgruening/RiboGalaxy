@@ -1,0 +1,2 @@
+chr1	test	transcript	1	9	.	+	.	gene_id "gene1"; transcript_id "test_tx";
+chr1	test	exon	1	9	.	+	.	gene_id "gene1"; transcript_id "test_tx";
