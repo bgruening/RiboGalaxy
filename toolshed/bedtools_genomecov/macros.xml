@@ -14,15 +14,15 @@
     <token name="@SAMTOOLS_VERSION@">1.9</token>
     <token name="@STD_BEDTOOLS_INPUTS@">bed,bedgraph,gff,vcf,encodepeak</token>
     <token name="@STD_BEDTOOLS_INPUT_LABEL@">BED/bedGraph/GFF/VCF/EncodePeak</token>
-    <token name="@PROFILE@">20.05</token>
+    <token name="@PROFILE@">25.0</token>
     <xml name="stdio">
         <stdio>
             <!-- Anything other than zero is an error -->
-            <exit_code range="1:" />
-            <exit_code range=":-1" />
+            <exit_code range="1:"/>
+            <exit_code range=":-1"/>
             <!-- In case the return code has not been set propery check stderr too -->
-            <regex match="Error:" />
-            <regex match="Exception:" />
+            <regex match="Error:"/>
+            <regex match="Exception:"/>
         </stdio>
         <version_command>bedtools --version</version_command>
     </xml>
@@ -32,8 +32,8 @@
             <option value="-r">Yes</option>
         </param>
     </xml>
-    <xml name="fraction" token_name="" token_argument="" token_label="" token_help="" >
-        <param name="@NAME@" argument="@ARGUMENT@" type="float" min="0" max="1" optional="true" label="@LABEL@" help="@HELP@" />
+    <xml name="fraction" token_name="" token_argument="" token_label="" token_help="">
+        <param name="@NAME@" argument="@ARGUMENT@" type="float" min="0" max="1" optional="true" label="@LABEL@" help="@HELP@"/>
     </xml>
     <xml name="overlap" token_name="overlap" token_argument="-f" token_fracof="A">
         <expand macro="fraction" name="@NAME@" argument="@ARGUMENT@" label="Minimum overlap required as a fraction of @FRACOF@" help="Default is 1E-9, i.e. 1bp."/>
@@ -57,15 +57,13 @@
                 <option value="True">Choose fixed seed</option>
             </param>
             <when value="True">
-                <param argument="-seed" type="integer" value="12345" label="Enter Seed" />
+                <param argument="-seed" type="integer" value="12345" label="Enter Seed"/>
             </when>
-            <when value="False" />
+            <when value="False"/>
         </conditional>
     </xml>
     <xml name="split">
-        <param argument="-split" type="boolean" truevalue="-split" falsevalue="" checked="false"
-            label="Treat split/spliced BAM or BED12 entries as distinct BED intervals when computing coverage."
-            help="If set, the coverage will be calculated based the spliced intervals only. For BAM files, this inspects the CIGAR N operation to infer the blocks for computing coverage. For BED12 files, this inspects the BlockCount, BlockStarts, and BlockEnds fields (i.e., columns 10,11,12). If this option is not set, coverage will be calculated based on the interval's START/END coordinates, and would include introns in the case of RNAseq data." />
+        <param argument="-split" type="boolean" truevalue="-split" falsevalue="" checked="false" label="Treat split/spliced BAM or BED12 entries as distinct BED intervals when computing coverage." help="If set, the coverage will be calculated based the spliced intervals only. For BAM files, this inspects the CIGAR N operation to infer the blocks for computing coverage. For BED12 files, this inspects the BlockCount, BlockStarts, and BlockEnds fields (i.e., columns 10,11,12). If this option is not set, coverage will be calculated based on the interval's START/END coordinates, and would include introns in the case of RNAseq data."/>
     </xml>
     <xml name="input_conditional_genome_file" token_optional="false" token_help="">
         <conditional name="genome_file_opts">
@@ -79,7 +77,7 @@
                 </param>
             </when> -->
             <when value="hist">
-                <param name="genome" type="data" optional="@OPTIONAL@" format="tabular" label="Genome file" />
+                <param name="genome" type="data" optional="@OPTIONAL@" format="tabular" label="Genome file"/>
             </when>
         </conditional>
     </xml>
@@ -124,21 +122,10 @@
 #end if
     </token>
     <xml name="closest_D_option">
-        <param argument="-iu" type="boolean" truevalue="-iu" falsevalue="" checked="false"
-            label="Ignore features in B that are upstream of features in A"
-            help="This option requires -D and follows its orientation rules for determining what is 'upstream'" />
-
-        <param argument="-id" type="boolean" truevalue="-id" falsevalue="" checked="false"
-            label="Ignore features in B that are downstream of features in A"
-            help="This option requires -D and follows its orientation rules for determining what is 'downstream'" />
-
-        <param argument="-fu" type="boolean" truevalue="-fu" falsevalue="" checked="false"
-            label="Choose first from features in B that are upstream of features in A"
-            help="This option requires -D and follows its orientation rules for determining what is 'upstream'" />
-
-        <param argument="-fd" type="boolean" truevalue="-fd" falsevalue="" checked="false"
-            label="Choose first from features in B that are downstream of features in A"
-            help="This option requires -D and follows its orientation rules for determining what is 'downstream'" />
+        <param argument="-iu" type="boolean" truevalue="-iu" falsevalue="" checked="false" label="Ignore features in B that are upstream of features in A" help="This option requires -D and follows its orientation rules for determining what is 'upstream'"/>
+        <param argument="-id" type="boolean" truevalue="-id" falsevalue="" checked="false" label="Ignore features in B that are downstream of features in A" help="This option requires -D and follows its orientation rules for determining what is 'downstream'"/>
+        <param argument="-fu" type="boolean" truevalue="-fu" falsevalue="" checked="false" label="Choose first from features in B that are upstream of features in A" help="This option requires -D and follows its orientation rules for determining what is 'upstream'"/>
+        <param argument="-fd" type="boolean" truevalue="-fd" falsevalue="" checked="false" label="Choose first from features in B that are downstream of features in A" help="This option requires -D and follows its orientation rules for determining what is 'downstream'"/>
     </xml>
     <xml name="addition">
         <conditional name="addition">
@@ -147,35 +134,32 @@
                 <option value="lr">Increase by Start Coordinate and End Coordinate</option>
             </param>
             <when value="b">
-                <param name="b" value="1" label="Number of base pairs" type="integer" />
+                <param name="b" value="1" label="Number of base pairs" type="integer"/>
             </when>
             <when value="lr">
-                <param name="l" type="integer" value="0" label="The number of base pairs to subtract from the start coordinate" />
-                <param name="r" type="integer" value="0" label="The number of base pairs to add to the end coordinate" />
+                <param name="l" type="integer" value="0" label="The number of base pairs to subtract from the start coordinate"/>
+                <param name="r" type="integer" value="0" label="The number of base pairs to add to the end coordinate"/>
             </when>
         </conditional>
     </xml>
     <xml name="print_header">
-        <param argument="-header" type="boolean" truevalue="-header" falsevalue="" checked="false"
-            label="Print the header from the A file prior to results" />
+        <param argument="-header" type="boolean" truevalue="-header" falsevalue="" checked="false" label="Print the header from the A file prior to results"/>
     </xml>
     <!-- TODO this is currently not used, but we should make use of it -->
     <xml name="genome_validator">
-        <validator type="unspecified_build" />
-        <validator type="dataset_metadata_in_data_table" table_name="fasta_indexes" metadata_name="dbkey" metadata_column="1" message="Sequences are not currently available for the specified build." />
+        <validator type="unspecified_build"/>
+        <validator type="dataset_metadata_in_data_table" table_name="fasta_indexes" metadata_name="dbkey" metadata_column="1" message="Sequences are not currently available for the specified build."/>
     </xml>
-
     <!-- ToDo column_picker -->
     <xml name="choose_columns">
-        <param name="cols" argument="-c" type="text" value=""
-            label="Specify the column(s) that should be summarized"
-            help="Comma separated">
+        <param name="cols" argument="-c" type="text" value="" label="Specify the column(s) that should be summarized" help="Comma separated">
             <sanitizer invalid_char="">
-                <valid initial="string.digits"><add value=","/></valid>
+                <valid initial="string.digits">
+                    <add value=","/>
+                </valid>
             </sanitizer>
         </param>
     </xml>
-
     <token name="@C_AND_O_ARGUMENT@">
         #set $col = list()
         #set $op = list()
@@ -188,23 +172,20 @@
             -o #echo ','.join($op)#
         #end if
     </token>
-
     <xml name="c_and_o_argument">
         <repeat name="c_and_o_argument_repeat" title="Applying operations to columns from merged intervals" min="0">
-            <yield />
+            <yield/>
             <expand macro="choose_operations">
-                <expand macro="math_options" />
-                <expand macro="additional_math_options" />
+                <expand macro="math_options"/>
+                <expand macro="additional_math_options"/>
             </expand>
         </repeat>
     </xml>
-
     <xml name="choose_operations">
         <param name="operation" type="select" label="Specify the operation">
-            <yield />
+            <yield/>
         </param>
     </xml>
-
     <xml name="math_options">
         <option value="sum" selected="true">Sum - numeric only</option>
         <option value="min">Min - numeric only</option>
@@ -225,8 +206,7 @@
     </xml>
     <xml name="sorted">
         <!-- -sorted -g  -->
-        <param argument="-sorted" type="boolean" truevalue="-sorted" falsevalue="" checked="false"
-            label="For coordinate sorted input file the more efficient sweeping algorithm is enabled."/>
+        <param argument="-sorted" type="boolean" truevalue="-sorted" falsevalue="" checked="false" label="For coordinate sorted input file the more efficient sweeping algorithm is enabled."/>
     </xml>
     <token name="@SORTED@">
 <![CDATA[
@@ -260,7 +240,7 @@ Bjoern A. Gruening (2014), `Galaxy wrapper <https://github.com/bgruening/galaxyt
     <xml name="citations">
         <citations>
             <citation type="doi">10.1093/bioinformatics/btq033</citation>
-            <yield />
+            <yield/>
         </citations>
     </xml>
 </macros>

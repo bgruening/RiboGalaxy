@@ -1,4 +1,4 @@
-<tool id="bowtie_transcriptomic_wrapper" name="Bowtie Transcriptome Alignment" version="1.5.1">
+<tool id="bowtie_transcriptomic_wrapper" name="Bowtie Transcriptome Alignment" version="1.5.1" profile="25.0">
     <description>Align to Transcriptome using Bowtie</description>
     <requirements>
         <requirement type="package" version="3.6">python</requirement>

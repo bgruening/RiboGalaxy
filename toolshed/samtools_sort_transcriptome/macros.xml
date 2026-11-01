@@ -6,7 +6,7 @@
         </requirements>
     </xml>
     <token name="@TOOL_VERSION@">1.13</token>
-    <token name="@PROFILE@">20.05</token>
+    <token name="@PROFILE@">25.0</token>
     <token name="@FLAGS@"><![CDATA[
         #set $flags = 0
         #if $filter
@@ -69,7 +69,6 @@
             #set reffai=None
         #end if
     ]]></token>
-
     <xml name="optional_reference">
         <conditional name="addref_cond">
             <param name="addref_select" type="select" label="Use a reference sequence">
@@ -87,7 +86,7 @@
                     <options from_data_table="fasta_indexes">
                         <filter type="data_meta" ref="input" key="dbkey" column="dbkey"/>
                     </options>
-                    <validator  type="no_options" message="No reference genome is available for the build associated with the selected input dataset"/>
+                    <validator type="no_options" message="No reference genome is available for the build associated with the selected input dataset"/>
                 </param>
             </when>
         </conditional>
@@ -106,14 +105,12 @@
                 <param name="ref" argument="@ARGUMENT@" type="select" label="Reference">
                     <options from_data_table="fasta_indexes">
                         <filter type="data_meta" ref="input" key="dbkey" column="dbkey"/>
-                        <validator message="No reference genome is available for the build associated with the selected input dataset" type="no_options" />
+                        <validator message="No reference genome is available for the build associated with the selected input dataset" type="no_options"/>
                     </options>
                 </param>
             </when>
         </conditional>
     </xml>
-
-
     <token name="@ADDTHREADS@"><![CDATA[
         ##compute the number of ADDITIONAL threads to be used by samtools (-@)
         addthreads=\${GALAXY_SLOTS:-1} && (( addthreads-- )) &&
@@ -125,7 +122,7 @@
         ((addmemory=addmemory*75/100)) &&
     ]]></token>
     <xml name="seed_input">
-       <param name="seed" type="integer" optional="True" label="Seed for random number generator" help="If empty a random seed is used." />
+        <param name="seed" type="integer" optional="True" label="Seed for random number generator" help="If empty a random seed is used."/>
     </xml>
     <xml name="flag_options" token_s1="false" token_s2="false" token_s4="false" token_s8="false" token_s16="false" token_s32="false" token_s64="false" token_s128="false" token_s256="false" token_s512="false" token_s1024="false" token_s2048="false">
         <option value="1" selected="@S1@">Read is paired</option>
@@ -141,7 +138,6 @@
         <option value="1024" selected="@S1024@">Read is a PCR or optical duplicate</option>
         <option value="2048" selected="@S2048@">Alignment is supplementary</option>
     </xml>
-
     <!-- region specification macros and tokens for tools that allow the specification
          of region by bed file / space separated list of regions -->
     <token name="@REGIONS_FILE@"><![CDATA[
@@ -172,11 +168,10 @@
                 </repeat>
             </when>
             <when value="tab">
-                <param name="targetregions" argument="-t/--target-regions" type="data" format="tabular" label="Target regions file" help="Do stats in these regions only. Tab-delimited file chr,from,to (1-based, inclusive)" />
+                <param name="targetregions" argument="-t/--target-regions" type="data" format="tabular" label="Target regions file" help="Do stats in these regions only. Tab-delimited file chr,from,to (1-based, inclusive)"/>
             </when>
         </conditional>
     </xml>
-
     <xml name="citations">
         <citations>
             <citation type="bibtex">
@@ -213,11 +208,11 @@
         </citations>
     </xml>
     <xml name="version_command">
-        <version_command><![CDATA[samtools 2>&1 | grep Version]]></version_command>
+        <version_command><![CDATA[samtools --version]]></version_command>
     </xml>
     <xml name="stdio">
         <stdio>
-            <exit_code range="1:" level="fatal" description="Error" />
+            <exit_code range="1:" level="fatal" description="Error"/>
         </stdio>
     </xml>
 </macros>

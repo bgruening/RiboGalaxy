@@ -1,4 +1,4 @@
-<tool id="trips_create_annotation" name="Create TRIPS-Viz annotation" version="1.2">
+<tool id="trips_create_annotation" name="Create TRIPS-Viz annotation" version="1.2" profile="25.0">
     <description>Covert GFF3/GTF and transcriptome FASTA to custom annotation sqlite</description>
     <requirements>
         <requirement type="package" version="3.37.1">sqlite</requirement>

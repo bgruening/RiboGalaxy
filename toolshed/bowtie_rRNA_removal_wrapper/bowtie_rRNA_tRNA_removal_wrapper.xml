@@ -1,4 +1,4 @@
-<tool id="bowtie_rRNA_tRNA_removal_wrapper" name="Bowtie ncRNA Removal" version="1.9.1">
+<tool id="bowtie_rRNA_tRNA_removal_wrapper" name="Bowtie ncRNA Removal" version="1.9.1" profile="25.0">
     <description>Remove rRNA and tRNA using Bowtie</description>
     <requirements>
         <requirement type="package" version="3.6">python</requirement>

@@ -1,4 +1,4 @@
-<tool id="get_chrom_sizes" name="Get Chromosome Sizes" version="2.9">
+<tool id="get_chrom_sizes" name="Get Chromosome Sizes" version="2.9" profile="25.0">
     <description>Generates a TAB Delimited chrom.sizes File from an Inputted FASTA</description>
     <requirements>
         <requirement type="package" version="3.10">python</requirement>

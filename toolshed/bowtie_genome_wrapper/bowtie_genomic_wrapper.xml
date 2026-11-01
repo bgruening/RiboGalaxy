@@ -1,4 +1,4 @@
-<tool id="bowtie_genomic_wrapper" name="Bowtie Genome Alignment" version="1.6.1">
+<tool id="bowtie_genomic_wrapper" name="Bowtie Genome Alignment" version="1.6.1" profile="25.0">
     <description>Align to the Genome with Bowtie</description>
     <requirements>
         <requirement type="package" version="3.6">python</requirement>

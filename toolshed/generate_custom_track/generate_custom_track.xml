@@ -1,4 +1,4 @@
-<tool id="generate_custom_track" name="Generate Custom Track" version="0.4">
+<tool id="generate_custom_track" name="Generate Custom Track" version="0.4" profile="25.0">
     <description>Generates a Custom Track File for GWIPS-viz.</description>
     <requirements>
         <requirement type="package" version="3.10">python</requirement>

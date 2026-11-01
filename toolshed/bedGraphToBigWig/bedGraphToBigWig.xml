@@ -1,4 +1,4 @@
-<tool id="bedGraphToBigWig" name="Convert a BED File to a BigWig" version="1.3">
+<tool id="bedGraphToBigWig" name="Convert a BED File to a BigWig" version="1.3" profile="25.0">
     <description>Convert Ribosome Profile BED File to a BigWig</description>
     <requirements>
         <requirement type="package" version="377">ucsc-bedgraphtobigwig</requirement>

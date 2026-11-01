@@ -1,4 +1,4 @@
-<tool id="create_ribosome_profiles" name="Create Ribosome Profiles" version="1.2">
+<tool id="create_ribosome_profiles" name="Create Ribosome Profiles" version="1.2" profile="25.0">
     <description>Produce sorted bedGraph A-site profiles of ribosome-protected fragments.</description>
     <requirements>
         <requirement type="package" version="1.79">biopython</requirement>

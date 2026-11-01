@@ -1,4 +1,4 @@
-<tool id="bam_to_sqlite" name="BAM to Sqlite" version="1.7">
+<tool id="bam_to_sqlite" name="BAM to Sqlite" version="1.7" profile="25.0">
     <description>Convert BAM file to SQLITE for Trips-Viz</description>
     <requirements>
         <requirement type="package" version="0.19.0">pysam</requirement>
